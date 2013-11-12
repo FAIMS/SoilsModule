@@ -214,8 +214,15 @@ makeVocab(String attrib){
 
 
 getCounterFromDB(){
-	Object counter = fetchOne("select response from (select coalesce(substr('0000'||(substr(freetext,8)+1),-4),'') as response, aenttimestamp from latestnondeletedarchentidentifiers where userid = 1) where response not in (select substr(freetext,8) from latestnondeletedarchentidentifiers) order by aenttimestamp desc limit 1;");
-	setFieldValue("control/data/AutoIncrement", counter.get(0));
+	Object counter = fetchOne("select response from (select coalesce(substr('0000'||(substr(freetext,8)+1),-4),'') as response, aenttimestamp from latestnondeletedarchentidentifiers where userid = "+userid+") where response not in (select substr(freetext,8) from latestnondeletedarchentidentifiers) order by aenttimestamp desc limit 1;");
+
+	String out = "";
+
+	if (!isNull(counter))
+		 out = counter.get(0);
+
+
+	setFieldValue("control/data/AutoIncrement", out);
 }
 
 /*** 'Uneditable' - you can edit the code below with extreme precaution ***/
