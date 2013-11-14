@@ -7,6 +7,13 @@ setFileSyncEnabled(true);
 startInternalGPS();
 
 
+makeLocalID(){
+	fetchOne("CREATE TABLE IF NOT EXISTS localSettings (key text primary key, value text);");
+
+}
+
+makeLocalID();
+
 
 /*** control ***/
 
@@ -26,26 +33,49 @@ refreshEntities() {
 onEvent("GeoSample/GeoSample_GeneralInformation/attachPhoto", "click", "attachPictureTo(\"GeoSample/GeoSample_GeneralInformation/Photo\")");
 
 onEvent("GeoSample/GeoSample_GeneralInformation/Update", "delayclick", "saveGeoSample()");
-onEvent("GeoSample/GeoSample_Top_Sample/Update", "delayclick", "saveGeoSample()");
-onEvent("GeoSample/GeoSample_Bottom_Sample/Update", "delayclick", "saveGeoSample()");
-onEvent("GeoSample/GeoSample_Rock_Information/Update", "delayclick", "saveGeoSample()");
+
 
 onEvent("GeoSample/GeoSample_Rock_Information/Delete", "delayclick", "deleteGeoSample()");
 onEvent("control/data/GeoSampleList", "click", "loadGeoSample()");
 onEvent("control/data/Create", "delayclick", "newGeoSample()");
-onEvent("GeoSample/GeoSample_GeneralInformation/SaveAndNew", "delayclick", "saveAndNewGeoSample()");
+onEvent("GeoSample/GeoSample_Rock_Information/SaveAndNew", "delayclick", "confirmSample()");
 onEvent("GeoSample/GeoSample_GeneralInformation/takeLongLat", "delayclick", "setUnprojectedPoints()");
 
+	
+cleanNumber(){
+	/*
+
+	I wish I could use...
+
+
+	String num = getFieldValue("control/data/AutoIncrement");
+
+	setFieldValue("control/data/AutoIncrement", String.format("%1$05.0d",num));
+	*/
+
+	Object num = fetchOne("select substr('00000' || '"+getFieldValue("control/data/AutoIncrement").replaceAll("[^0-9]","")+"',-5);");
+		setFieldValue("control/data/AutoIncrement", num.get(0));
+
+
+
+
+}
 setUnprojectedPoints(){
 
+	showToast("Getting Point.");
 	position = getGPSPosition();
-	if (position == null) {
+	positionProj = getGPSPositionProjected();
+
+	if (position == null || positionProj == null) {
 		showToast("Unable to determine GPS Position.");
 		return;
 	}
 
 	setFieldValue("GeoSample/GeoSample_GeneralInformation/Longitude", position.getLongitude());
 	setFieldValue("GeoSample/GeoSample_GeneralInformation/Latitude", position.getLatitude());
+	setFieldValue("GeoSample/GeoSample_GeneralInformation/Easting", positionProj.getLongitude());
+	setFieldValue("GeoSample/GeoSample_GeneralInformation/Northing", positionProj.getLatitude());
+
 
 	/*
 
@@ -56,7 +86,6 @@ setUnprojectedPoints(){
 	//attributes.add(createEntityAttribute("gps_heading", "" + getGPSHeading(), null, null, null));
 	attributes.add(createEntityAttribute("gps_accuracy", "" + getGPSEstimatedAccuracy(), null, null, null));
 	
-	positionProj = getGPSPositionProjected();
 
 	*/
 
@@ -78,33 +107,37 @@ if (isNull(getFieldValue("GeoSample/GeoSample_GeneralInformation/Site_ID"))) {
 	// first null is map data
 
 	//saveTabGroup("GeoSample", GeoSample_id, data, null, "GeoSample_id = getLastSavedRecordId(); clearCreatedGeometry();");
+
 	saveTabGroup("GeoSample", GeoSample_id, null, null, "GeoSample_id = getLastSavedRecordId();getCounterFromDB();newGeoSample();");
 	
 }
 
+confirmSample(){
+	showAlert("Confirm Sample!", "I confirm that the sample is in the vehicle!", "saveAndNewGeoSample()", "saveGeoSample()");
+	
+}
+
 String GeoSample_id = null;
-
+//TODO make sampling team string thingo work better.
 newGeoSample(){
+	if (!isNull(getFieldValue("control/data/AutoIncrement"))){
+		cleanNumber();
+		GeoSample_id = null;
+		newTabGroup("GeoSample");
+	    
+	   loadGeoSampleAttributes();
+	   setFieldValue("GeoSample/GeoSample_GeneralInformation/Timestamp", getCurrentTime());
+	   setFieldValue("GeoSample/GeoSample_GeneralInformation/Site_ID", "NZG-"+getDeviceNum()+"-"+getFieldValue("control/data/AutoIncrement"));
+	   setFieldValue("GeoSample/GeoSample_Top_Sample/Top_Sample_ID", getFieldValue("GeoSample/GeoSample_GeneralInformation/Site_ID")+"-A");
+	   setFieldValue("GeoSample/GeoSample_Bottom_Sample/Bottom_Sample_ID", getFieldValue("GeoSample/GeoSample_GeneralInformation/Site_ID")+"-B");
+	   setFieldValue("GeoSample/GeoSample_Rock_Information/Sampling_Device", getFieldValue("user/usertab/samplingTeam"));
 
-	GeoSample_id = null;
-	newTabGroup("GeoSample");
-    
-   loadGeoSampleAttributes();
-   setFieldValue("GeoSample/GeoSample_GeneralInformation/Timestamp", getCurrentTime());
-   setFieldValue("GeoSample/GeoSample_GeneralInformation/Site_ID", "NZG-"+getFieldValue("user/usertab/samplingTeam")+"-"+getFieldValue("control/data/AutoIncrement"));
 
-}
-onEvent("GeoSample/GeoSample_Top_Sample", "show", "setTopID()");
-setTopID(){
-	if (isNull(getFieldValue("GeoSample/GeoSample_Top_Sample/Top_Sample_ID")))
-		setFieldValue("GeoSample/GeoSample_Top_Sample/Top_Sample_ID", getFieldValue("GeoSample/GeoSample_GeneralInformation/Site_ID")+"-A");
+	} else {
+		showWarning("Missing Data", "You need to enter a site ID to start counting from!");
+	}
 }
 
-onEvent("GeoSample/GeoSample_Bottom_Sample", "show", "setBottomID()");
-setBottomID(){
-	if (isNull(getFieldValue("GeoSample/GeoSample_Bottom_Sample/Bottom_Sample_ID")))
-		setFieldValue("GeoSample/GeoSample_Bottom_Sample/Bottom_Sample_ID", getFieldValue("GeoSample/GeoSample_GeneralInformation/Site_ID")+"-B");
-}
 
 loadGeoSampleAttributes(){
 
@@ -130,9 +163,32 @@ loadGeoSampleAttributes(){
     populateRadioGroup("GeoSample/GeoSample_Rock_Information/Slope", makeVocab("Slope"));
 	populateDropDown("GeoSample/GeoSample_Rock_Information/Landuse", makeVocab("Landuse"));
 
+	populateDropDown("GeoSample/GeoSample_Rock_Information/Sampling_Device", fetchAll("select vocabid, vocabname from vocabulary where vocabid in (select value from localSettings where key = 'Device');"));
+
+
+	//workaround for bug.
+	/*
+	setFieldValue("GeoSample/GeoSample_GeneralInformation/Longitude", "");
+	setFieldValue("GeoSample/GeoSample_GeneralInformation/Latitude", "");
+	setFieldValue("GeoSample/GeoSample_GeneralInformation/Easting", "");
+	setFieldValue("GeoSample/GeoSample_GeneralInformation/Northing", "");
+	*/
+	
+
 
 }
 
+getDeviceNum(){
+	
+
+	
+
+	Object value = fetchOne("select vocabName from vocabulary where vocabid = "+getFieldValue("user/usertab/samplingTeam"));
+
+	return value.get(0).replaceAll("([^0-9]+)", "");;
+
+
+}
 
 saveGeoSample() {
 	if (isNull(getFieldValue("GeoSample/GeoSample_GeneralInformation/Site_ID"))) {
@@ -161,6 +217,7 @@ deleteGeoSample(){
 reallyDeleteGeoSample(){
     deleteArchEnt(GeoSample_id);
     cancelTabGroup("GeoSample", false);
+    getCounterFromDB();
 }
 
 doNotDelete(){
@@ -177,9 +234,9 @@ loadGeoSampleFrom(GeoSampleid) {
 	//newGeoSample();
 	GeoSample_id = GeoSampleid;
 	if (isNull(GeoSample_id)) return;
-	showToast(GeoSample_id);
-	showTabGroup("GeoSample", GeoSample_id);
 	loadGeoSampleAttributes();	
+	showTabGroup("GeoSample", GeoSample_id);
+	
 
 }
 
@@ -214,12 +271,24 @@ makeVocab(String attrib){
 
 
 getCounterFromDB(){
-	Object counter = fetchOne("select response from (select coalesce(substr('0000'||(substr(freetext,8)+1),-4),'') as response, aenttimestamp from latestnondeletedarchentidentifiers where userid = "+userid+") where response not in (select substr(freetext,8) from latestnondeletedarchentidentifiers) order by aenttimestamp desc limit 1;");
+	Object counter = fetchOne(""+
+"select response, deviceMatch "+
+"  from (select coalesce(substr('00000'||(substr(freetext,8)+1),-5),'') as response, aenttimestamp, uuid in (select uuid "+
+"																							                  from latestnondeletedaentvalue AS av, localSettings "+
+"																							                 where localSettings.key = 'Device' "+
+"																							                   and localSettings.value = av.VocabID ) as deviceMatch "+
+"		  from latestnondeletedarchentidentifiers)      "+
+"where substr(response,-5) not in (select substr(freetext,-5) from latestnondeletedarchentidentifiers) "+
+"order by deviceMatch desc, aenttimestamp desc limit 1;");
 
 	String out = "";
 
-	if (!isNull(counter))
+	if (!isNull(counter)){
 		 out = counter.get(0);
+		 
+		 if (counter.get(1).equals("0"))
+		 	showWarning("Alert!", "ID may be intruding in other Device's allocated ID range.");
+	}
 
 
 	setFieldValue("control/data/AutoIncrement", out);
@@ -322,7 +391,18 @@ getDefaultUsersList() {
 
 populateListForUsers(){
     populateDropDown("user/usertab/users", getDefaultUsersList());
-    populateDropDown("user/usertab/samplingTeam", fetchAll("select substr(VocabName, -2), VocabName from Vocabulary join AttributeKey using (attributeid) where attributeName = 'Sampling Crew'"));
+    populateDropDown("user/usertab/samplingTeam", makeVocab("Sampling Device"));
+
+    Object localDevice = fetchOne("select value from localSettings where key = 'Device';");
+    Object localUser = fetchOne("select value from localSettings where key = 'User';");
+
+    if (!isNull(localDevice)){
+    	setFieldValue("user/usertab/samplingTeam", localDevice.get(0));
+    }
+
+    if (!isNull(localUser)){
+    	setFieldValue("user/usertab/users", localUser.get(0));
+    }
 }
 
 populateListForUsers();
@@ -337,6 +417,9 @@ login(){
 	setUser(user);
 	username = userResult.get(1) + " " + userResult.get(2);
 	showTabGroup("control");
+ 
+	fetchOne("REPLACE INTO localSettings(key, value) VALUES('User', '"+userid+"');");
+	fetchOne("REPLACE INTO localSettings(key, value) VALUES('Device', '"+getFieldValue("user/usertab/samplingTeam")+"');");
 
 	getCounterFromDB();
 

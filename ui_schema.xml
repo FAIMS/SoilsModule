@@ -45,14 +45,26 @@
             <GeoSample_GeneralInformation>
               <Site_ID/>
               <Timestamp/>
-              <Longitude/>
-              <Latitude/>
+              <container1>
+                <child1>
+                  <Latitude/>
+                </child1>
+                <child2>
+                  <Longitude/>
+                </child2>
+              </container1>
+              <container2>
+                <child1>
+                  <Northing/>
+                </child1>
+                <child2>
+                  <Easting/>
+                </child2>
+              </container2>
               <takeLongLat/>
               <Photo/>
               <attachPhoto/>
               <Update/>
-              <SaveAndNew/>
-              
             </GeoSample_GeneralInformation>
             <GeoSample_Top_Sample>
               <Top_Sample_ID/>
@@ -64,7 +76,6 @@
               <Dom_Size_A/>
               <Fraction_A/>
               <State_A/>
-              <Update/>
             </GeoSample_Top_Sample>
             <GeoSample_Bottom_Sample>
               <Bottom_Sample_ID/>
@@ -76,7 +87,6 @@
               <Dom_Size_B/>
               <Fraction_B/>
               <State_B/>
-              <Update/>
             </GeoSample_Bottom_Sample>
             <GeoSample_Rock_Information>
               <Slope/>
@@ -87,11 +97,14 @@
               <Comments/>
               <Update/>
               <Delete/>
+              <SaveAndNew/>
+              <Sampling_Device/>
             </GeoSample_Rock_Information>
           </GeoSample>
         </faims>
       </instance>
       <!--list of numeric and blocktext(memo) attributes(fields)-->
+      <bind nodeset="/faims/control/data/AutoIncrement" type="decimal"/>
       <bind nodeset="/faims/GeoSample/GeoSample_Rock_Information/Comments" type="string"/>
       <bind nodeset="/faims/GeoSample/GeoSample_Rock_Information/Contamination" type="string"/>
       <bind nodeset="/faims/GeoSample/GeoSample_Rock_Information/PhotoNumbers" type="string"/>
@@ -155,42 +168,67 @@
           </item>
         </select1>
       </group>
-    
-    <group ref="gps">
-      <label>Control</label>
-      <trigger ref="connectexternal">
-        <label>Connect To External GPS</label>
-      </trigger>
-      <trigger ref="connectinternal">
-        <label>Connect To Internal GPS</label>
-      </trigger>
-      <trigger ref="startsync">
-        <label>Start Synching</label>
-      </trigger>
-      <trigger ref="stopsync">
-        <label>Stop Synching</label>
-      </trigger>
-    </group>
+      <group ref="gps">
+        <label>Control</label>
+        <trigger ref="connectexternal">
+          <label>Connect To External GPS</label>
+        </trigger>
+        <trigger ref="connectinternal">
+          <label>Connect To Internal GPS</label>
+        </trigger>
+        <trigger ref="startsync">
+          <label>Start Synching</label>
+        </trigger>
+        <trigger ref="stopsync">
+          <label>Stop Synching</label>
+        </trigger>
+      </group>
     </group>
     <!--GEOSAMPLE-->
     <group faims_archent_type="GeoSample" ref="GeoSample">
       <label>{GeoSample}</label>
       <group ref="GeoSample_GeneralInformation">
         <label>GeoSample</label>
-        <input faims_attribute_name="Site ID" faims_attribute_type="freetext" faims_certainty="false" faims_read_only="false" ref="Site_ID">
+        <input faims_attribute_name="Site ID" faims_attribute_type="freetext" faims_certainty="false" faims_read_only="true" ref="Site_ID">
           <label>{Site_ID}</label>
         </input>
-        <input faims_attribute_name="Timestamp" faims_attribute_type="measure" faims_certainty="false" faims_read_only="true" ref="Timestamp" faims_annotation="false">
+        <input faims_annotation="false" faims_attribute_name="Timestamp" faims_attribute_type="measure" faims_certainty="false" faims_read_only="true" ref="Timestamp">
           <label>{Timestamp}</label>
         </input>
-        <input faims_attribute_name="Longitude" faims_attribute_type="measure" faims_certainty="false" faims_read_only="false" ref="Longitude" faims_annotation="false">
-          <label>Longitude</label>
-        </input>
-        <input faims_attribute_name="Latitude" faims_attribute_type="measure" faims_certainty="false" faims_read_only="false" ref="Latitude" faims_annotation="false">
-          <label>Latitude</label>
-        </input>
+        <group faims_style="orientation" ref="container1">
+          <label/>
+          <group faims_style="even" ref="child1">
+            <label/>
+
+            <input faims_annotation="false" faims_attribute_name="Latitude" faims_attribute_type="measure" faims_certainty="false" faims_read_only="false" ref="Latitude">
+              <label>Latitude</label>
+            </input>
+          </group>
+          <group faims_style="even" ref="child2">
+            <label/>
+            <input faims_annotation="false" faims_attribute_name="Longitude" faims_attribute_type="measure" faims_certainty="false" faims_read_only="false" ref="Longitude">
+              <label>Longitude</label>
+            </input>
+          </group>
+        </group>
+        <group faims_style="orientation" ref="container2">
+          <label/>
+          <group faims_style="even" ref="child1">
+            <label/>
+
+            <input faims_annotation="false" faims_attribute_name="Northing" faims_attribute_type="measure" faims_certainty="false" faims_read_only="false" ref="Northing">
+              <label>Northing</label>
+            </input>
+          </group>
+          <group faims_style="even" ref="child2">
+            <label/>
+            <input faims_annotation="false" faims_attribute_name="Easting" faims_attribute_type="measure" faims_certainty="false" faims_read_only="false" ref="Easting">
+              <label>Easting</label>
+            </input>
+          </group>
+        </group>
         <trigger ref="takeLongLat">
-          <label>Take Longitude and Latitude</label>
+          <label>Take Position From GPS</label>
         </trigger>
         <select faims_annotation="false" faims_attribute_name="Photo" faims_attribute_type="freetext" faims_certainty="false" faims_sync="true" ref="Photo" type="camera">
           <label>Photos</label>
@@ -205,15 +243,10 @@
         <trigger ref="Update">
           <label>Save Record</label>
         </trigger>
-        <trigger ref="SaveAndNew">
-          <label>Save Record and Open New</label>
-        </trigger>
-
-        
       </group>
       <group ref="GeoSample_Top_Sample">
         <label>{Top_Sample}</label>
-        <input faims_annotation="false" faims_attribute_name="Top Sample ID" faims_attribute_type="freetext" faims_certainty="false" faims_read_only="false" ref="Top_Sample_ID">
+        <input faims_annotation="false" faims_attribute_name="Top Sample ID" faims_attribute_type="freetext" faims_certainty="false" faims_read_only="true" ref="Top_Sample_ID">
           <label>{Top_Sample_ID}</label>
         </input>
         <!--We would like to see Radiogroup-->
@@ -241,7 +274,7 @@
           </item>
         </select1>
         <!--We would like to see Radiogroup-->
-        <select1 appearance="full" faims_attribute_name="Upper Depth A" faims_attribute_type="vocab" faims_certainty="false" faims_read_only="false" ref="Upper_Depth_A" faims_annotation="false">
+        <select1 appearance="full" faims_annotation="false" faims_attribute_name="Upper Depth A" faims_attribute_type="vocab" faims_certainty="false" faims_read_only="false" ref="Upper_Depth_A">
           <label>{Upper_Depth_A}</label>
           <item>
             <label>placeholder</label>
@@ -249,7 +282,7 @@
           </item>
         </select1>
         <!--We would like to see Radiogroup-->
-        <select1 appearance="full" faims_attribute_name="Bottom Depth A" faims_attribute_type="vocab" faims_certainty="false" faims_read_only="false" ref="Bottom_Depth_A" faims_annotation="false">
+        <select1 appearance="full" faims_annotation="false" faims_attribute_name="Bottom Depth A" faims_attribute_type="vocab" faims_certainty="false" faims_read_only="false" ref="Bottom_Depth_A">
           <label>{Bottom_Depth_A}</label>
           <item>
             <label>placeholder</label>
@@ -257,7 +290,7 @@
           </item>
         </select1>
         <!--We would like to see Dropdown-->
-        <select1 faims_attribute_name="Dom Size A" faims_attribute_type="vocab" faims_certainty="false" faims_read_only="false" ref="Dom_Size_A" faims_annotation="false">
+        <select1 faims_annotation="false" faims_attribute_name="Dom Size A" faims_attribute_type="vocab" faims_certainty="false" faims_read_only="false" ref="Dom_Size_A">
           <label>{Dom_Size_A}</label>
           <item>
             <label>placeholder</label>
@@ -265,7 +298,7 @@
           </item>
         </select1>
         <!--We would like to see Radiogroup-->
-        <select1 appearance="full" faims_attribute_name="Fraction A" faims_attribute_type="vocab" faims_certainty="false" faims_read_only="false" ref="Fraction_A" faims_annotation="false">
+        <select1 appearance="full" faims_annotation="false" faims_attribute_name="Fraction A" faims_attribute_type="vocab" faims_certainty="false" faims_read_only="false" ref="Fraction_A">
           <label>{Fraction_A}</label>
           <item>
             <label>placeholder</label>
@@ -273,24 +306,21 @@
           </item>
         </select1>
         <!--We would like to see Radiogroup-->
-        <select1 appearance="full" faims_attribute_name="State A" faims_attribute_type="vocab" faims_certainty="false" faims_read_only="false" ref="State_A" faims_annotation="false">
+        <select1 appearance="full" faims_annotation="false" faims_attribute_name="State A" faims_attribute_type="vocab" faims_certainty="false" faims_read_only="false" ref="State_A">
           <label>{State_A}</label>
           <item>
             <label>placeholder</label>
             <value>placeholder</value>
           </item>
         </select1>
-        <trigger ref="Update">
-          <label>{Save.Record}</label>
-        </trigger>
       </group>
       <group ref="GeoSample_Bottom_Sample">
         <label>{Bottom_Sample}</label>
-        <input faims_attribute_name="Bottom Sample ID" faims_attribute_type="freetext" faims_certainty="false" faims_read_only="false" ref="Bottom_Sample_ID" faims_annotation="false">
+        <input faims_annotation="false" faims_attribute_name="Bottom Sample ID" faims_attribute_type="freetext" faims_certainty="false" faims_read_only="true" ref="Bottom_Sample_ID">
           <label>{Bottom_Sample_ID}</label>
         </input>
         <!--We would like to see Radiogroup-->
-        <select1 appearance="full" faims_attribute_name="Bottom Sample Collected?" faims_attribute_type="vocab" faims_certainty="false" faims_read_only="false" ref="Bottom_Sample_Collected_" faims_annotation="false">
+        <select1 appearance="full" faims_annotation="false" faims_attribute_name="Bottom Sample Collected?" faims_attribute_type="vocab" faims_certainty="false" faims_read_only="false" ref="Bottom_Sample_Collected_">
           <label>{Bottom_Sample_Collected?}</label>
           <item>
             <label>placeholder</label>
@@ -298,7 +328,7 @@
           </item>
         </select1>
         <!--We would like to see Radiogroup-->
-        <select1 appearance="full" faims_attribute_name="Regolith B" faims_attribute_type="vocab" faims_certainty="false" faims_read_only="false" ref="Regolith_B" faims_annotation="false">
+        <select1 appearance="full" faims_annotation="false" faims_attribute_name="Regolith B" faims_attribute_type="vocab" faims_certainty="false" faims_read_only="false" ref="Regolith_B">
           <label>{Regolith_B}</label>
           <item>
             <label>placeholder</label>
@@ -306,7 +336,7 @@
           </item>
         </select1>
         <!--We would like to see Radiogroup-->
-        <select1 appearance="full" faims_attribute_name="Horizon B" faims_attribute_type="vocab" faims_certainty="false" faims_read_only="false" ref="Horizon_B" faims_annotation="false">
+        <select1 appearance="full" faims_annotation="false" faims_attribute_name="Horizon B" faims_attribute_type="vocab" faims_certainty="false" faims_read_only="false" ref="Horizon_B">
           <label>{Horizon_B}</label>
           <item>
             <label>placeholder</label>
@@ -314,7 +344,7 @@
           </item>
         </select1>
         <!--We would like to see Radiogroup-->
-        <select1 appearance="full" faims_attribute_name="Upper Depth B" faims_attribute_type="vocab" faims_certainty="false" faims_read_only="false" ref="Upper_Depth_B" faims_annotation="false">
+        <select1 appearance="full" faims_annotation="false" faims_attribute_name="Upper Depth B" faims_attribute_type="vocab" faims_certainty="false" faims_read_only="false" ref="Upper_Depth_B">
           <label>{Upper_Depth_B}</label>
           <item>
             <label>placeholder</label>
@@ -322,7 +352,7 @@
           </item>
         </select1>
         <!--We would like to see Radiogroup-->
-        <select1 appearance="full" faims_attribute_name="Bottom Depth B" faims_attribute_type="vocab" faims_certainty="false" faims_read_only="false" ref="Bottom_Depth_B" faims_annotation="false">
+        <select1 appearance="full" faims_annotation="false" faims_attribute_name="Bottom Depth B" faims_attribute_type="vocab" faims_certainty="false" faims_read_only="false" ref="Bottom_Depth_B">
           <label>{Bottom_Depth_B}</label>
           <item>
             <label>placeholder</label>
@@ -330,7 +360,7 @@
           </item>
         </select1>
         <!--We would like to see Dropdown-->
-        <select1 faims_attribute_name="Dom Size B" faims_attribute_type="vocab" faims_certainty="false" faims_read_only="false" ref="Dom_Size_B" faims_annotation="false">
+        <select1 faims_annotation="false" faims_attribute_name="Dom Size B" faims_attribute_type="vocab" faims_certainty="false" faims_read_only="false" ref="Dom_Size_B">
           <label>{Dom_Size_B}</label>
           <item>
             <label>placeholder</label>
@@ -338,7 +368,7 @@
           </item>
         </select1>
         <!--We would like to see Radiogroup-->
-        <select1 appearance="full" faims_attribute_name="Fraction B" faims_attribute_type="vocab" faims_certainty="false" faims_read_only="false" ref="Fraction_B" faims_annotation="false">
+        <select1 appearance="full" faims_annotation="false" faims_attribute_name="Fraction B" faims_attribute_type="vocab" faims_certainty="false" faims_read_only="false" ref="Fraction_B">
           <label>{Fraction_B}</label>
           <item>
             <label>placeholder</label>
@@ -346,19 +376,19 @@
           </item>
         </select1>
         <!--We would like to see Radiogroup-->
-        <select1 appearance="full" faims_attribute_name="State B" faims_attribute_type="vocab" faims_certainty="false" faims_read_only="false" ref="State_B" faims_annotation="false">
+        <select1 appearance="full" faims_annotation="false" faims_attribute_name="State B" faims_attribute_type="vocab" faims_certainty="false" faims_read_only="false" ref="State_B">
           <label>{State_B}</label>
           <item>
             <label>placeholder</label>
             <value>placeholder</value>
           </item>
         </select1>
-        <trigger ref="Update">
-          <label>{Save.Record}</label>
-        </trigger>
       </group>
       <group ref="GeoSample_Rock_Information">
         <label>{Rock_Information}</label>
+        <trigger ref="SaveAndNew">
+          <label>Save Record and Open New</label>
+        </trigger>
         <!--We would like to see Radiogroup-->
         <select1 appearance="full" faims_attribute_name="Slope" faims_attribute_type="vocab" faims_certainty="true" faims_read_only="false" ref="Slope">
           <label>{Slope}</label>
@@ -386,13 +416,15 @@
         </input>
         <input faims_attribute_name="Photo Comments" faims_attribute_type="freetext" faims_certainty="true" faims_read_only="false" ref="Photo_Comments">
           <label>{Photo_Comments}</label>
-
-         
         </input>
-        <trigger ref="Update">
-          <label>{Save.Record}</label>
-        </trigger>
-         <trigger ref="Delete">
+        <select1 faims_annotation="false" faims_attribute_name="Sampling Device" faims_attribute_type="vocab" faims_certainty="false" faims_read_only="true" ref="Sampling_Device">
+          <label>{Sampling Device}</label>
+          <item>
+            <label>placeholder</label>
+            <value>placeholder</value>
+          </item>
+        </select1>
+        <trigger ref="Delete">
           <label>{Delete.Record}</label>
         </trigger>
       </group>

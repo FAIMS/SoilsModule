@@ -31,6 +31,12 @@
     <property type="measure" name="Longitude">
       <description>In 4236/WGS-84, the longitude of the plotted point.</description>
     </property>
+    <property type="measure" name="Northing">
+      <description>In NZgrid 2000, (EPSG 2193), the Northing of the plotted point.</description>
+    </property>
+    <property type="measure" name="Easting">
+      <description>In NZgrid 2000, (EPSG 2193), the Easting of the plotted point.</description>
+    </property>    
     <property type="enum" name="Collected?">
       <description>Was Topsoil sample collected? Answer Yes/No.</description>
       <lookup>
@@ -190,29 +196,29 @@
     <property type="file" name="Photo">
       <description>Photos of the Site</description>
     </property>
-    <property type="enum" name="Sampling Crew">
+    <property type="enum" name="Sampling Device">
       <description>A seperate variable to record sampling crew</description>
       <lookup>
-        <term>Crew 01</term>
-        <term>Crew 02</term>
-        <term>Crew 03</term>
-        <term>Crew 04</term>
-        <term>Crew 05</term>
-        <term>Crew 06</term>
-        <term>Crew 07</term>
-        <term>Crew 08</term>
-        <term>Crew 09</term>
-        <term>Crew 10</term>
-        <term>Crew 11</term>
-        <term>Crew 12</term>
-        <term>Crew 13</term>
-        <term>Crew 14</term>
-        <term>Crew 15</term>
-        <term>Crew 16</term>
-        <term>Crew 17</term>
-        <term>Crew 18</term>
-        <term>Crew 19</term>
-        <term>Crew 20</term>        
+        <term>Device 01</term>
+        <term>Device 02</term>
+        <term>Device 03</term>
+        <term>Device 04</term>
+        <term>Device 05</term>
+        <term>Device 06</term>
+        <term>Device 07</term>
+        <term>Device 08</term>
+        <term>Device 09</term>
+        <term>Device 10</term>
+        <term>Device 11</term>
+        <term>Device 12</term>
+        <term>Device 13</term>
+        <term>Device 14</term>
+        <term>Device 15</term>
+        <term>Device 16</term>
+        <term>Device 17</term>
+        <term>Device 18</term>
+        <term>Device 19</term>
+        <term>Device 20</term>        
       </lookup>
     </property>
   </ArchaeologicalElement>
