@@ -76,6 +76,7 @@
               <Dom_Size_A/>
               <Fraction_A/>
               <State_A/>
+              <next/>
             </GeoSample_Top_Sample>
             <GeoSample_Bottom_Sample>
               <Bottom_Sample_ID/>
@@ -87,6 +88,7 @@
               <Dom_Size_B/>
               <Fraction_B/>
               <State_B/>
+              <next/>
             </GeoSample_Bottom_Sample>
             <GeoSample_Rock_Information>
               <Slope/>
@@ -258,7 +260,7 @@
           </item>
         </select1>
         <!--We would like to see Radiogroup-->
-        <select1 appearance="full" faims_annotation="false" faims_attribute_name="Regolith A" faims_attribute_type="vocab" faims_certainty="false" faims_read_only="false" ref="Regolith_A">
+        <select1 appearance="full" faims_attribute_name="Regolith A" faims_attribute_type="vocab" faims_certainty="false" faims_read_only="false" ref="Regolith_A">
           <label>{Regolith_A}</label>
           <item>
             <label>placeholder</label>
@@ -266,7 +268,7 @@
           </item>
         </select1>
         <!--We would like to see Radiogroup-->
-        <select1 appearance="full" faims_annotation="false" faims_attribute_name="Horizon A" faims_attribute_type="vocab" faims_certainty="false" faims_read_only="false" ref="Horizon_A">
+        <select1 appearance="full" faims_attribute_name="Horizon A" faims_attribute_type="vocab" faims_certainty="false" faims_read_only="false" ref="Horizon_A">
           <label>{Horizon_A}</label>
           <item>
             <label>placeholder</label>
@@ -274,7 +276,7 @@
           </item>
         </select1>
         <!--We would like to see Radiogroup-->
-        <select1 appearance="full" faims_annotation="false" faims_attribute_name="Upper Depth A" faims_attribute_type="vocab" faims_certainty="false" faims_read_only="false" ref="Upper_Depth_A">
+        <select1 appearance="full" faims_attribute_name="Upper Depth A" faims_attribute_type="vocab" faims_certainty="false" faims_read_only="false" ref="Upper_Depth_A">
           <label>{Upper_Depth_A}</label>
           <item>
             <label>placeholder</label>
@@ -282,7 +284,7 @@
           </item>
         </select1>
         <!--We would like to see Radiogroup-->
-        <select1 appearance="full" faims_annotation="false" faims_attribute_name="Bottom Depth A" faims_attribute_type="vocab" faims_certainty="false" faims_read_only="false" ref="Bottom_Depth_A">
+        <select1 appearance="full" faims_attribute_name="Bottom Depth A" faims_attribute_type="vocab" faims_certainty="false" faims_read_only="false" ref="Bottom_Depth_A">
           <label>{Bottom_Depth_A}</label>
           <item>
             <label>placeholder</label>
@@ -298,7 +300,7 @@
           </item>
         </select1>
         <!--We would like to see Radiogroup-->
-        <select1 appearance="full" faims_annotation="false" faims_attribute_name="Fraction A" faims_attribute_type="vocab" faims_certainty="false" faims_read_only="false" ref="Fraction_A">
+        <select1 appearance="full" faims_attribute_name="Fraction A" faims_attribute_type="vocab" faims_certainty="false" faims_read_only="false" ref="Fraction_A">
           <label>{Fraction_A}</label>
           <item>
             <label>placeholder</label>
@@ -313,6 +315,9 @@
             <value>placeholder</value>
           </item>
         </select1>
+        <trigger ref="next">
+          <label>Next</label>
+        </trigger>
       </group>
       <group ref="GeoSample_Bottom_Sample">
         <label>{Bottom_Sample}</label>
@@ -328,7 +333,7 @@
           </item>
         </select1>
         <!--We would like to see Radiogroup-->
-        <select1 appearance="full" faims_annotation="false" faims_attribute_name="Regolith B" faims_attribute_type="vocab" faims_certainty="false" faims_read_only="false" ref="Regolith_B">
+        <select1 appearance="full" faims_attribute_name="Regolith B" faims_attribute_type="vocab" faims_certainty="false" faims_read_only="false" ref="Regolith_B">
           <label>{Regolith_B}</label>
           <item>
             <label>placeholder</label>
@@ -336,7 +341,7 @@
           </item>
         </select1>
         <!--We would like to see Radiogroup-->
-        <select1 appearance="full" faims_annotation="false" faims_attribute_name="Horizon B" faims_attribute_type="vocab" faims_certainty="false" faims_read_only="false" ref="Horizon_B">
+        <select1 appearance="full" faims_attribute_name="Horizon B" faims_attribute_type="vocab" faims_certainty="false" faims_read_only="false" ref="Horizon_B">
           <label>{Horizon_B}</label>
           <item>
             <label>placeholder</label>
@@ -344,7 +349,7 @@
           </item>
         </select1>
         <!--We would like to see Radiogroup-->
-        <select1 appearance="full" faims_annotation="false" faims_attribute_name="Upper Depth B" faims_attribute_type="vocab" faims_certainty="false" faims_read_only="false" ref="Upper_Depth_B">
+        <select1 appearance="full" faims_attribute_name="Upper Depth B" faims_attribute_type="vocab" faims_certainty="false" faims_read_only="false" ref="Upper_Depth_B">
           <label>{Upper_Depth_B}</label>
           <item>
             <label>placeholder</label>
@@ -352,7 +357,7 @@
           </item>
         </select1>
         <!--We would like to see Radiogroup-->
-        <select1 appearance="full" faims_annotation="false" faims_attribute_name="Bottom Depth B" faims_attribute_type="vocab" faims_certainty="false" faims_read_only="false" ref="Bottom_Depth_B">
+        <select1 appearance="full" faims_attribute_name="Bottom Depth B" faims_attribute_type="vocab" faims_certainty="false" faims_read_only="false" ref="Bottom_Depth_B">
           <label>{Bottom_Depth_B}</label>
           <item>
             <label>placeholder</label>
@@ -368,7 +373,7 @@
           </item>
         </select1>
         <!--We would like to see Radiogroup-->
-        <select1 appearance="full" faims_annotation="false" faims_attribute_name="Fraction B" faims_attribute_type="vocab" faims_certainty="false" faims_read_only="false" ref="Fraction_B">
+        <select1 appearance="full" faims_attribute_name="Fraction B" faims_attribute_type="vocab" faims_certainty="false" faims_read_only="false" ref="Fraction_B">
           <label>{Fraction_B}</label>
           <item>
             <label>placeholder</label>
@@ -383,12 +388,14 @@
             <value>placeholder</value>
           </item>
         </select1>
+        <trigger ref="next">
+          <label>Next</label>
+        </trigger>
+
       </group>
       <group ref="GeoSample_Rock_Information">
         <label>{Rock_Information}</label>
-        <trigger ref="SaveAndNew">
-          <label>Save Record and Open New</label>
-        </trigger>
+
         <!--We would like to see Radiogroup-->
         <select1 appearance="full" faims_attribute_name="Slope" faims_attribute_type="vocab" faims_certainty="true" faims_read_only="false" ref="Slope">
           <label>{Slope}</label>
@@ -424,6 +431,9 @@
             <value>placeholder</value>
           </item>
         </select1>
+          <trigger ref="SaveAndNew">
+          <label>Save Record and Open New</label>
+        </trigger>
         <trigger ref="Delete">
           <label>{Delete.Record}</label>
         </trigger>

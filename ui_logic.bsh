@@ -6,6 +6,7 @@ setSyncEnabled(true);
 setFileSyncEnabled(true);
 startInternalGPS();
 
+showWarning("Thanks for trying this module!", "We have provided for Demonstration purposes only. You can customise the module yourself or we can help you. Contact info@fedarch.org for help.");
 
 makeLocalID(){
 	fetchOne("CREATE TABLE IF NOT EXISTS localSettings (key text primary key, value text);");
@@ -40,8 +41,14 @@ onEvent("control/data/GeoSampleList", "click", "loadGeoSample()");
 onEvent("control/data/Create", "delayclick", "newGeoSample()");
 onEvent("GeoSample/GeoSample_Rock_Information/SaveAndNew", "delayclick", "confirmSample()");
 onEvent("GeoSample/GeoSample_GeneralInformation/takeLongLat", "delayclick", "setUnprojectedPoints()");
-
-	
+onEvent("GeoSample/GeoSample_Top_Sample/next", "click", "goToB()");
+onEvent("GeoSample/GeoSample_Bottom_Sample/next", "click", "goToRock()");
+goToB(){
+	showTab("GeoSample/GeoSample_Bottom_Sample");
+}	
+goToRock(){
+	showTab("GeoSample/GeoSample_Rock_Information");
+}
 cleanNumber(){
 	/*
 
@@ -113,7 +120,7 @@ if (isNull(getFieldValue("GeoSample/GeoSample_GeneralInformation/Site_ID"))) {
 }
 
 confirmSample(){
-	showAlert("Confirm Sample!", "I confirm that the sample is in the vehicle!", "saveAndNewGeoSample()", "saveGeoSample()");
+	showAlert("Confirm Sample!", "I confirm that I have labeled the sample bag and placed "+getFieldValue("GeoSample/GeoSample_GeneralInformation/Site_ID")+" in the vehicle.", "saveAndNewGeoSample()", "saveGeoSample()");
 	
 }
 
@@ -151,7 +158,7 @@ loadGeoSampleAttributes(){
     populateRadioGroup("GeoSample/GeoSample_Top_Sample/State_A", makeVocab("State A"));
 
 
-    populateRadioGroup("GeoSample/GeoSample_Bottom_Sample/Bottom_Sample_Collected_", makeVocab("Bottom Sample Collected_?"));
+    populateRadioGroup("GeoSample/GeoSample_Bottom_Sample/Bottom_Sample_Collected_", makeVocab("Bottom Sample Collected?"));
     populateRadioGroup("GeoSample/GeoSample_Bottom_Sample/Regolith_B", makeVocab("Regolith B"));
     populateRadioGroup("GeoSample/GeoSample_Bottom_Sample/Horizon_B", makeVocab("Horizon B"));
     populateRadioGroup("GeoSample/GeoSample_Bottom_Sample/Upper_Depth_B", makeVocab("Upper Depth B"));
@@ -167,13 +174,13 @@ loadGeoSampleAttributes(){
 
 
 	//workaround for bug.
-	/*
+	
 	setFieldValue("GeoSample/GeoSample_GeneralInformation/Longitude", "");
 	setFieldValue("GeoSample/GeoSample_GeneralInformation/Latitude", "");
 	setFieldValue("GeoSample/GeoSample_GeneralInformation/Easting", "");
 	setFieldValue("GeoSample/GeoSample_GeneralInformation/Northing", "");
-	*/
 	
+
 
 
 }

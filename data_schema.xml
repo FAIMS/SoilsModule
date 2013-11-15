@@ -38,7 +38,7 @@
       <description>In NZgrid 2000, (EPSG 2193), the Easting of the plotted point.</description>
     </property>    
     <property type="enum" name="Collected?">
-      <description>Was Topsoil sample collected? Answer Yes/No.</description>
+      <description></description>
       <lookup>
         <term HeuristID="0-3300" StandardCode="">{No}<description/></term>
         <term HeuristID="0-3299" StandardCode="">{Yes}<description/></term>
@@ -89,7 +89,7 @@
       </lookup>
     </property>
     <property type="enum" name="State A">
-      <description>Is the sample dry or damp?</description>
+      <description></description>
       <lookup>
         <term HeuristID="0-3318" StandardCode="">{Damp}<description/></term>
         <term HeuristID="0-3319" StandardCode="">{Dry}<description/></term>
@@ -99,7 +99,7 @@
       <description>Auto-generated bottom sample ID</description>
     </property>
     <property type="enum" name="Bottom Sample Collected?">
-      <description>Is Bottom Sample Collected?</description>
+      <description></description>
       <lookup>
         <term HeuristID="0-3300" StandardCode="">{No}<description/></term>
         <term HeuristID="0-3299" StandardCode="">{Yes}<description/></term>
@@ -150,7 +150,7 @@
       </lookup>
     </property>
     <property type="enum" name="State B">
-      <description>Is bottom sample dry or damp?</description>
+      <description></description>
       <lookup>
         <term HeuristID="0-3318" StandardCode="">{Damp}<description/></term>
         <term HeuristID="0-3319" StandardCode="">{Dry}<description/></term>
