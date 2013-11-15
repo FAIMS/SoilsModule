@@ -6,7 +6,7 @@ setSyncEnabled(true);
 setFileSyncEnabled(true);
 startInternalGPS();
 
-showWarning("Thanks for trying this module!", "We have provided for Demonstration purposes only. You can customise the module yourself or we can help you. Contact info@fedarch.org for help.");
+showWarning("Thanks for trying this module!", "We have provided this module for Demonstration purposes only. You can customise the module yourself or we can help you. Contact info@fedarch.org for help.");
 
 makeLocalID(){
 	fetchOne("CREATE TABLE IF NOT EXISTS localSettings (key text primary key, value text);");
