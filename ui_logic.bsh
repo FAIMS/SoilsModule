@@ -303,14 +303,30 @@ getCounterFromDB(){
 
 /*** 'Uneditable' - you can edit the code below with extreme precaution ***/
 
-/*
+zoomGPS(){
+	Object position = getGPSPositionProjected();
+	Object projPosition = getGPSPositionProjected();
+	if (projPosition != null ){
+		Double latitude = projPosition.getLatitude();
+		Double longitude = projPosition.getLongitude();
+		showToast("Zooming to "+position.getLongitude()+", "+position.getLatitude());
+		setMapFocusPoint("control/map/map", longitude, latitude);
+	} else {
+		showToast("GPS Not initialized");
+	}
+
+}
+
+onEvent("control/map/zoomGPS", "click", "zoomGPS()");
+
+
 initMap() {
 	setMapZoom("control/map/map", 19.0f);
 
-	//showBaseMap("control/map/map", "Base Layer", "files/data/maps/ZAG-TPan-3857-grass-tiled.tif");
-	createCanvasLayer("control/map/map", "Non-saved sketch layer");
-
-    DATA_ENTRY_LAYER_ID = createCanvasLayer("control/map/map", DATA_ENTRY_LAYER);
+	showBaseMap("control/map/map", "Base Layer", "files/data/maps/Otago_RTP.tif");
+	//createCanvasLayer("control/map/map", "Non-saved sketch layer");
+/*
+    //DATA_ENTRY_LAYER_ID = createCanvasLayer("control/map/map", DATA_ENTRY_LAYER);
 
 	isEntity = true;
 	queryName = "All entities";
@@ -344,11 +360,13 @@ initMap() {
 	pos = createPolygonStyle(10, Color.parseColor("#440000FF"), createLineStyle(10, Color.parseColor("#AA000000"), 0.01f, 0.3f, null));
 	ts = createTextStyle(10, Color.WHITE, 40, Typeface.SANS_SERIF);
 
-	showDatabaseLayer("control/map/map", "Saved Data Layer", isEntity, queryName, querySQL, ps, ls, pos, ts);
+	showDatabaseLayer("control/map/map", "Saved Data Layer", isEntity, queryName, querySQL, ps, ls, pos, ts);*/
+
+
 }
 
 initMap();
-*/
+
 
 /*** TRACKLOG ***/
 /*
