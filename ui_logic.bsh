@@ -152,7 +152,11 @@ newGeoSample(){
                             onFetch(result) {
                                 String deviceNumber = result.get(0).replaceAll("([^0-9]+)", "");
                                 setFieldValue("GeoSample/GeoSample_GeneralInformation/Site_ID", "NZG-"+deviceNumber+"-"+getFieldValue("control/data/AutoIncrement"));
-                                setFieldValue("GeoSample/GeoSample_GeneralInformation/Timestamp", getCurrentTime());
+                                fetchOne("select datetime('now', 'localtime');", new FetchCallback() {
+                                    onFetch(result) {
+                                        setFieldValue("GeoSample/GeoSample_GeneralInformation/Timestamp", result.get(0));
+                                    }
+                                });
                                 setFieldValue("GeoSample/GeoSample_Top_Sample/Top_Sample_ID", getFieldValue("GeoSample/GeoSample_GeneralInformation/Site_ID")+"-A");
                                 setFieldValue("GeoSample/GeoSample_Bottom_Sample/Bottom_Sample_ID", getFieldValue("GeoSample/GeoSample_GeneralInformation/Site_ID")+"-B");
                                 setFieldValue("GeoSample/GeoSample_Rock_Information/Sampling_Device", getFieldValue("user/usertab/samplingTeam"));
