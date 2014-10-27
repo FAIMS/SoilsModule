@@ -84,8 +84,7 @@ addActionBarItem("external_gps", new ToggleActionButtonCallback() {
 showWarning("Thanks for trying this module!", "We have provided this module for Demonstration purposes only. You can customise the module yourself or we can help you. Contact info@fedarch.org for help.");
 
 makeLocalID(){
-    fetchOne("CREATE TABLE IF NOT EXISTS localSettings (key text primary key, value text);");
-
+    fetchOne("CREATE TABLE IF NOT EXISTS localSettings (key text primary key, value text);",  null);
 }
 
 makeLocalID();
@@ -338,7 +337,7 @@ saveEntitiesToRel(String type, String entity1, String entity2, Callable callback
         onSave(rel_id, newRecord) {
             addReln(entity1, rel_id, null);
             addReln(entity2, rel_id, null);
-            callback.call();
+            if(callback != null) callback.call();
         }
     });
 }
@@ -466,22 +465,22 @@ initMap();
 populateListForUsers() {
     fetchAll("select userid, fname ||' ' || lname from user", new FetchCallback() {
         onFetch(result) {
-            populateDropDown("user/usertab/users", result);        
+            populateDropDown("user/usertab/users", result);
+            fetchOne("select value from localSettings where key = 'User';", new FetchCallback() {
+                onFetch(result) {
+                    if (!isNull(result)){
+                        setFieldValue("user/usertab/users", result.get(0));
+                    }
+                }
+            });
         }
     });
-    makeVocab("DropDown", "user/usertab/samplingTeam", "Sampling Device");
+    makeVocab("RadioGroup", "user/usertab/Team", "Device ID");
 
-    fetchOne("select value from localSettings where key = 'Device';", new FetchCallback() {
+    fetchOne("select value from localSettings where key = 'Team';", new FetchCallback() {
         onFetch(result) {
             if (!isNull(result)){
-                setFieldValue("user/usertab/samplingTeam", result.get(0));
-            }
-        }
-    });
-    fetchOne("select value from localSettings where key = 'User';", new FetchCallback() {
-        onFetch(result) {
-            if (!isNull(result)){
-                setFieldValue("user/usertab/users", result.get(0));
+                setFieldValue("user/usertab/Team", result.get(0));
             }
         }
     });
