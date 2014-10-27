@@ -1,3 +1,4 @@
+import java.util.concurrent.Callable;
 /*** 'Editable' - you can edit the code below based on the needs ***/
 User user; // don't touch
 String userid;
@@ -6,428 +7,480 @@ setSyncEnabled(true);
 setFileSyncEnabled(true);
 startInternalGPS();
 
+addActionBarItem("sync", new ToggleActionButtonCallback() {
+    actionOnLabel() {
+        "Sync enabled";
+    }
+    actionOn() {
+        setSyncEnabled(false);
+        setFileSyncEnabled(false);
+        showToast("Sync disabled.");
+    }
+    isActionOff() {
+        isSyncEnabled();
+    }
+    actionOffLabel() {
+        "Sync disabled";
+    }
+    actionOff() {
+        setSyncEnabled(true);
+        setFileSyncEnabled(true);
+        showToast("Sync enabled.");
+    }
+});
+
+addActionBarItem("internal_gps", new ToggleActionButtonCallback() {
+    actionOnLabel() {
+        "Internal GPS enabled";
+    }
+    actionOn() {
+        stopGPS();
+        showToast("GPS disabled.");
+    }
+    isActionOff() {
+        isInternalGPSOn();
+    }
+    actionOffLabel() {
+        "Internal GPS disabled";
+    }
+    actionOff() {
+        if(isExternalGPSOn()) {
+            stopGPS();
+        }
+        startInternalGPS();
+        showToast("GPS enabled.");
+    }
+});
+
+addActionBarItem("external_gps", new ToggleActionButtonCallback() {
+    actionOnLabel() {
+        "External GPS enabled";
+    }
+    actionOn() {
+        stopGPS();
+        showToast("GPS disabled.");
+    }
+    isActionOff() {
+        isExternalGPSOn();
+    }
+    actionOffLabel() {
+        "External GPS disabled";
+    }
+    actionOff() {
+        if(isInternalGPSOn()) {
+            stopGPS();
+        }
+        startExternalGPS();
+        if(isBluetoothConnected()) {
+            showToast("GPS enabled.");
+        } else {
+            showToast("Please enable bluetooth.");
+            this.isActionOff();
+        }
+        
+    }
+});
+
 showWarning("Thanks for trying this module!", "We have provided this module for Demonstration purposes only. You can customise the module yourself or we can help you. Contact info@fedarch.org for help.");
 
 makeLocalID(){
-	fetchOne("CREATE TABLE IF NOT EXISTS localSettings (key text primary key, value text);");
+    fetchOne("CREATE TABLE IF NOT EXISTS localSettings (key text primary key, value text);");
 
 }
 
 makeLocalID();
 
-
 /*** control ***/
 
-onEvent("control/data", "show", "refreshEntities()");
-onEvent("control/gps/connectexternal", "click", "startExternalGPS()");
-onEvent("control/gps/connectinternal", "click", "startInternalGPS()");
-
-/*** ArchEnt: GeoSample ***/
-
+onEvent("control/data", "show", "refreshEntities();removeNavigationButtons();");
+onEvent("control/data/GeoSampleList", "click", "loadGeoSample();");
+onEvent("control/data/Create", "delayclick", "newGeoSample();");
+onEvent("control/gps/connectinternal", "click", "internalGPSLogic();");
+onEvent("control/gps/connectexternal", "click", "externalGPSLogic();");
 
 refreshEntities() {
-	showToast("Fetching saved GeoSamples...");
-	populateList("control/data/GeoSampleList", fetchEntityList("GeoSample"));
+    fetchEntityList("GeoSample", new FetchCallback() {
+        onFetch(result) {
+            populateList("control/data/GeoSampleList", result);    
+        }
+        
+    });
 }
 
+removeNavigationButtons() {
+    removeNavigationButton("save");
+    removeNavigationButton("delete");
+}
 
-onEvent("GeoSample/GeoSample_GeneralInformation/attachPhoto", "click", "attachPictureTo(\"GeoSample/GeoSample_GeneralInformation/Photo\")");
+internalGPSLogic() {
+    if(isExternalGPSOn()) {
+        stopGPS();
+    }
+    startInternalGPS();
+}
 
-onEvent("GeoSample/GeoSample_GeneralInformation/Update", "delayclick", "saveGeoSample()");
+externalGPSLogic() {
+    if(isInternalGPSOn()) {
+        stopGPS();
+    }
+    startExternalGPS();
+}
 
+/*** ArchEnt: GeoSample ***/
+onEvent("GeoSample", "show", "addGeoSampleNavigation();");
+onEvent("GeoSample/GeoSample_GeneralInformation/attachPhoto", "click", "attachPictureTo(\"GeoSample/GeoSample_GeneralInformation/Photo\");");
+onEvent("GeoSample/GeoSample_GeneralInformation/takeGPS", "delayclick", "fillInGPS(\"GeoSample/GeoSample_GeneralInformation/\");");
 
-onEvent("GeoSample/GeoSample_Rock_Information/Delete", "delayclick", "deleteGeoSample()");
-onEvent("control/data/GeoSampleList", "click", "loadGeoSample()");
-onEvent("control/data/Create", "delayclick", "newGeoSample()");
 onEvent("GeoSample/GeoSample_Rock_Information/SaveAndNew", "delayclick", "confirmSample()");
-onEvent("GeoSample/GeoSample_GeneralInformation/takeLongLat", "delayclick", "setUnprojectedPoints()");
-onEvent("GeoSample/GeoSample_Top_Sample/next", "click", "goToB()");
-onEvent("GeoSample/GeoSample_Bottom_Sample/next", "click", "goToRock()");
-goToB(){
-	showTab("GeoSample/GeoSample_Bottom_Sample");
-}	
-goToRock(){
-	showTab("GeoSample/GeoSample_Rock_Information");
-}
-cleanNumber(){
-	/*
+onEvent("GeoSample/GeoSample_Rock_Information/Delete", "delayclick", "deleteGeoSample()");
 
-	I wish I could use...
+onEvent("GeoSample/GeoSample_Top_Sample/next", "click", "showTab(\"GeoSample/GeoSample_Bottom_Sample\");");
+onEvent("GeoSample/GeoSample_Bottom_Sample/next", "click", "showTab(\"GeoSample/GeoSample_Rock_Information\");");
 
+String geo_sample_id = null;
 
-	String num = getFieldValue("control/data/AutoIncrement");
-
-	setFieldValue("control/data/AutoIncrement", String.format("%1$05.0d",num));
-	*/
-
-	Object num = fetchOne("select substr('00000' || '"+getFieldValue("control/data/AutoIncrement").replaceAll("[^0-9]","")+"',-5);");
-		setFieldValue("control/data/AutoIncrement", num.get(0));
-
-
-
-
-}
-setUnprojectedPoints(){
-
-	showToast("Getting Point.");
-	position = getGPSPosition();
-	positionProj = getGPSPositionProjected();
-
-	if (position == null || positionProj == null) {
-		showToast("Unable to determine GPS Position.");
-		return;
-	}
-
-	setFieldValue("GeoSample/GeoSample_GeneralInformation/Longitude", position.getLongitude());
-	setFieldValue("GeoSample/GeoSample_GeneralInformation/Latitude", position.getLatitude());
-	setFieldValue("GeoSample/GeoSample_GeneralInformation/Easting", positionProj.getLongitude());
-	setFieldValue("GeoSample/GeoSample_GeneralInformation/Northing", positionProj.getLatitude());
-
-
-	/*
-
-	//attributes.add(createEntityAttribute("gps_user", "" + user.getUserId(), null, null, null));
-	attributes.add(createEntityAttribute("gps_timestamp", "" + getCurrentTime(), null, null, null));
-	attributes.add(createEntityAttribute("gps_longitude", "" + position.getLongitude(), null, null, null));
-	attributes.add(createEntityAttribute("gps_latitude", "" + position.getLatitude(), null, null, null));
-	//attributes.add(createEntityAttribute("gps_heading", "" + getGPSHeading(), null, null, null));
-	attributes.add(createEntityAttribute("gps_accuracy", "" + getGPSEstimatedAccuracy(), null, null, null));
-	
-
-	*/
-
-
-
-}
-saveAndNewGeoSample(){
-
-if (isNull(getFieldValue("GeoSample/GeoSample_GeneralInformation/Site_ID"))) {
-		showWarning("Logic Error", "Cannot save record without id");
-		return;
-	}
-	
-	//data = getCreatedGeometry();
-	if (!isNull(GeoSample_id)) {
-		entity = fetchArchEnt(GeoSample_id);
-		//data = entity.getGeometryList();
-	}
-	// first null is map data
-
-	//saveTabGroup("GeoSample", GeoSample_id, data, null, "GeoSample_id = getLastSavedRecordId(); clearCreatedGeometry();");
-
-	saveTabGroup("GeoSample", GeoSample_id, null, null, "GeoSample_id = getLastSavedRecordId();getCounterFromDB();newGeoSample();");
-	
-}
-
-confirmSample(){
-	showAlert("Confirm Sample!", "I confirm that I have labeled the sample bag and placed "+getFieldValue("GeoSample/GeoSample_GeneralInformation/Site_ID")+" in the vehicle.", "saveAndNewGeoSample()", "saveGeoSample()");
-	
-}
-
-String GeoSample_id = null;
-//TODO make sampling team string thingo work better.
 newGeoSample(){
-	if (!isNull(getFieldValue("control/data/AutoIncrement"))){
-		cleanNumber();
-		GeoSample_id = null;
-		newTabGroup("GeoSample");
-	    
-	   loadGeoSampleAttributes();
-	   setFieldValue("GeoSample/GeoSample_GeneralInformation/Timestamp", getCurrentTime());
-	   setFieldValue("GeoSample/GeoSample_GeneralInformation/Site_ID", "NZG-"+getDeviceNum()+"-"+getFieldValue("control/data/AutoIncrement"));
-	   setFieldValue("GeoSample/GeoSample_Top_Sample/Top_Sample_ID", getFieldValue("GeoSample/GeoSample_GeneralInformation/Site_ID")+"-A");
-	   setFieldValue("GeoSample/GeoSample_Bottom_Sample/Bottom_Sample_ID", getFieldValue("GeoSample/GeoSample_GeneralInformation/Site_ID")+"-B");
-	   setFieldValue("GeoSample/GeoSample_Rock_Information/Sampling_Device", getFieldValue("user/usertab/samplingTeam"));
-
-
-	} else {
-		showWarning("Missing Data", "You need to enter a site ID to start counting from!");
-	}
+    if (!isNull(getFieldValue("control/data/AutoIncrement"))) {
+        newTabGroup("GeoSample");
+        geo_sample_id = null;
+        fetchOne("select substr('00000' || '"+getFieldValue("control/data/AutoIncrement").replaceAll("[^0-9]","")+"',-5);",
+            new FetchCallback() {
+                onFetch(result) {
+                    setFieldValue("control/data/AutoIncrement", result.get(0));
+                    fetchOne("select vocabName from vocabulary where vocabid = "+getFieldValue("user/usertab/samplingTeam"),
+                        new FetchCallback() {
+                            onFetch(result) {
+                                String deviceNumber = result.get(0).replaceAll("([^0-9]+)", "");
+                                setFieldValue("GeoSample/GeoSample_GeneralInformation/Site_ID", "NZG-"+deviceNumber+"-"+getFieldValue("control/data/AutoIncrement"));
+                                setFieldValue("GeoSample/GeoSample_GeneralInformation/Timestamp", getCurrentTime());
+                                setFieldValue("GeoSample/GeoSample_Top_Sample/Top_Sample_ID", getFieldValue("GeoSample/GeoSample_GeneralInformation/Site_ID")+"-A");
+                                setFieldValue("GeoSample/GeoSample_Bottom_Sample/Bottom_Sample_ID", getFieldValue("GeoSample/GeoSample_GeneralInformation/Site_ID")+"-B");
+                                setFieldValue("GeoSample/GeoSample_Rock_Information/Sampling_Device", getFieldValue("user/usertab/samplingTeam"));
+                                saveTabGroup("GeoSample", geo_sample_id, null, null, new SaveCallback() {
+                                    onSave(uuid, newRecord) {
+                                        geo_sample_id = uuid;
+                                        autoNumGeoSample();
+                                        // Turn on autosaving
+                                        saveTabGroup("GeoSample", geo_sample_id, null, null, new SaveCallback() {
+                                            onSave(uuid, newRecord) {
+                                                geo_sample_id = uuid;
+                                                autoNumGeoSample();
+                                            }
+                                        }, true);
+                                    }
+                                });
+                            }
+                        });
+                }
+            });
+    } else {
+        showWarning("Missing Data", "You need to enter a site ID to start counting from!");
+    }
 }
 
-
-loadGeoSampleAttributes(){
-
-    populateRadioGroup("GeoSample/GeoSample_Top_Sample/Collected_", makeVocab("Collected?"));
-    populateRadioGroup("GeoSample/GeoSample_Top_Sample/Regolith_A", makeVocab("Regolith A"));
-    populateRadioGroup("GeoSample/GeoSample_Top_Sample/Horizon_A", makeVocab("Horizon A"));
-    populateRadioGroup("GeoSample/GeoSample_Top_Sample/Upper_Depth_A", makeVocab("Upper Depth A"));
-    populateRadioGroup("GeoSample/GeoSample_Top_Sample/Bottom_Depth_A", makeVocab("Bottom Depth A"));
-	populateDropDown("GeoSample/GeoSample_Top_Sample/Dom_Size_A", makeVocab("Dom Size A"));
-    populateRadioGroup("GeoSample/GeoSample_Top_Sample/Fraction_A", makeVocab("Fraction A"));
-    populateRadioGroup("GeoSample/GeoSample_Top_Sample/State_A", makeVocab("State A"));
-
-
-    populateRadioGroup("GeoSample/GeoSample_Bottom_Sample/Bottom_Sample_Collected_", makeVocab("Bottom Sample Collected?"));
-    populateRadioGroup("GeoSample/GeoSample_Bottom_Sample/Regolith_B", makeVocab("Regolith B"));
-    populateRadioGroup("GeoSample/GeoSample_Bottom_Sample/Horizon_B", makeVocab("Horizon B"));
-    populateRadioGroup("GeoSample/GeoSample_Bottom_Sample/Upper_Depth_B", makeVocab("Upper Depth B"));
-    populateRadioGroup("GeoSample/GeoSample_Bottom_Sample/Bottom_Depth_B", makeVocab("Bottom Depth B"));
-	populateDropDown("GeoSample/GeoSample_Bottom_Sample/Dom_Size_B", makeVocab("Dom Size B"));
-    populateRadioGroup("GeoSample/GeoSample_Bottom_Sample/Fraction_B", makeVocab("Fraction B"));
-    populateRadioGroup("GeoSample/GeoSample_Bottom_Sample/State_B", makeVocab("State B"));
-	
-    populateRadioGroup("GeoSample/GeoSample_Rock_Information/Slope", makeVocab("Slope"));
-	populateDropDown("GeoSample/GeoSample_Rock_Information/Landuse", makeVocab("Landuse"));
-
-	populateDropDown("GeoSample/GeoSample_Rock_Information/Sampling_Device", fetchAll("select vocabid, vocabname from vocabulary where vocabid in (select value from localSettings where key = 'Device');"));
-
-
-	//workaround for bug.
-	
-	setFieldValue("GeoSample/GeoSample_GeneralInformation/Longitude", "");
-	setFieldValue("GeoSample/GeoSample_GeneralInformation/Latitude", "");
-	setFieldValue("GeoSample/GeoSample_GeneralInformation/Easting", "");
-	setFieldValue("GeoSample/GeoSample_GeneralInformation/Northing", "");
-	
-
-
-
+loadGeoSample() {
+    geo_sample_id = getListItemValue();
+    loadGeoSampleFrom(geo_sample_id);
 }
 
-getDeviceNum(){
-	
-
-	
-
-	Object value = fetchOne("select vocabName from vocabulary where vocabid = "+getFieldValue("user/usertab/samplingTeam"));
-
-	return value.get(0).replaceAll("([^0-9]+)", "");;
-
-
+loadGeoSampleFrom(entid) {
+    geo_sample_id = entid;
+    if (isNull(geo_sample_id)) {
+        showToast("No {GeoSample} selected.");
+        return;
+    }
+    showTabGroup("GeoSample", geo_sample_id, new FetchCallback() {
+        onFetch(result){
+            saveTabGroup("GeoSample", geo_sample_id, null, null, new SaveCallback() {
+                onSave(uuid, newRecord) {
+                    geo_sample_id = uuid;
+                    autoNumGeoSample();    
+                }
+            }, true);
+        }
+    });
 }
 
-saveGeoSample() {
-	if (isNull(getFieldValue("GeoSample/GeoSample_GeneralInformation/Site_ID"))) {
-		showWarning("Logic Error", "Cannot save record without id");
-		return;
-	}
-	
-	//data = getCreatedGeometry();
-	if (!isNull(GeoSample_id)) {
-		entity = fetchArchEnt(GeoSample_id);
-		//data = entity.getGeometryList();
-	}
-	// first null is map data
-
-	//saveTabGroup("GeoSample", GeoSample_id, data, null, "GeoSample_id = getLastSavedRecordId(); clearCreatedGeometry();");
-	saveTabGroup("GeoSample", GeoSample_id, null, null, "GeoSample_id = getLastSavedRecordId();getCounterFromDB();");
-	
+saveAndNewGeoSample() {
+    if (isNull(getFieldValue("GeoSample/GeoSample_GeneralInformation/Site_ID"))) {
+        showWarning("Validation Error", "Cannot save {GeoSample} without Site ID");
+        return;
+    }
+    saveTabGroup("GeoSample", geo_sample_id, null, null, new SaveCallback() {
+        onSave(uuid, newRecord) {
+            geo_sample_id = uuid;
+            newGeoSample();
+        }
+    });
 }
 
 deleteGeoSample(){
-	if (!isNull(GeoSample_id)) {
+    if (!isNull(geo_sample_id)) {
         showAlert("Confirm Deletion", "Press OK to Delete this GeoSample!", "reallyDeleteGeoSample()", "doNotDelete()");
-	}
+    } else {
+        cancelTabGroup("GeoSample", false);
+    }
 }
 
 reallyDeleteGeoSample(){
-    deleteArchEnt(GeoSample_id);
+    deleteArchEnt(geo_sample_id);
     cancelTabGroup("GeoSample", false);
-    getCounterFromDB();
+    autoNumGeoSample();
+}
+
+autoNumGeoSample() {
+    fetchOne("select response, deviceMatch "+
+             "from (select coalesce(substr('00000'||(substr(measure,8)+1),-5),'') as response, aenttimestamp, uuid in (select uuid " +
+             "      from latestnondeletedaentvalue AS av, localSettings "+
+             "      where localSettings.key = 'Device' "+
+             "      and localSettings.value = av.VocabID ) as deviceMatch "+
+             "  from latestnondeletedarchentidentifiers) "+
+             "where substr(response,-5) not in (select substr(measure,-5) from latestnondeletedarchentidentifiers) "+
+             "order by deviceMatch desc, aenttimestamp desc limit 1;", new FetchCallback() {
+                onFetch(result) {
+                    String out = "";
+                    if (!isNull(result)){
+                        out = result.get(0);
+                        if (result.get(1).equals("0")) {
+                            showWarning("Alert!", "ID may be intruding in other Device's allocated ID range.");
+                        }
+                    }
+                    setFieldValue("control/data/AutoIncrement", out);
+                }
+             });
+}
+
+loadGeoSampleAttributes(){
+    makeVocab("RadioGroup", "GeoSample/GeoSample_Top_Sample/Collected", "Collected");
+    makeVocab("RadioGroup", "GeoSample/GeoSample_Top_Sample/Regolith_A", "Regolith A");
+    makeVocab("RadioGroup", "GeoSample/GeoSample_Top_Sample/Horizon_A", "Horizon A");
+    makeVocab("RadioGroup", "GeoSample/GeoSample_Top_Sample/Upper_Depth_A", "Upper Depth A");
+    makeVocab("RadioGroup", "GeoSample/GeoSample_Top_Sample/Bottom_Depth_A", "Bottom Depth A");
+    makeVocab("DropDown", "GeoSample/GeoSample_Top_Sample/Dom_Size_A", "Dom Size A");
+    makeVocab("RadioGroup", "GeoSample/GeoSample_Top_Sample/Fraction_A", "Fraction A");
+    makeVocab("RadioGroup", "GeoSample/GeoSample_Top_Sample/State_A", "State A");
+
+    makeVocab("RadioGroup", "GeoSample/GeoSample_Bottom_Sample/Bottom_Sample_Collected", "Bottom Sample Collected");
+    makeVocab("RadioGroup", "GeoSample/GeoSample_Bottom_Sample/Regolith_B", "Regolith B");
+    makeVocab("RadioGroup", "GeoSample/GeoSample_Bottom_Sample/Horizon_B", "Horizon B");
+    makeVocab("RadioGroup", "GeoSample/GeoSample_Bottom_Sample/Upper_Depth_B", "Upper Depth B");
+    makeVocab("RadioGroup", "GeoSample/GeoSample_Bottom_Sample/Bottom_Depth_B", "Bottom Depth B");
+    makeVocab("DropDown", "GeoSample/GeoSample_Bottom_Sample/Dom_Size_B", "Dom Size B");
+    makeVocab("RadioGroup", "GeoSample/GeoSample_Bottom_Sample/Fraction_B", "Fraction B");
+    makeVocab("RadioGroup", "GeoSample/GeoSample_Bottom_Sample/State_B", "State B");
+
+    makeVocab("RadioGroup", "GeoSample/GeoSample_Rock_Information/Slope", "Slope");
+    makeVocab("DropDown", "GeoSample/GeoSample_Rock_Information/Landuse", "Landuse");
+
+    fetchAll("select vocabid, vocabname from vocabulary where vocabid in (select value from localSettings where key = 'Device');",
+        new FetchCallback() {
+            onFetch(result) {
+                populateDropDown("GeoSample/GeoSample_Rock_Information/Sampling_Device", result);
+            }
+        });
+}
+
+addGeoSampleNavigation() {
+    removeNavigationButton("save");
+    removeNavigationButton("delete");
+
+    addNavigationButton("save", new ActionButtonCallback() {
+        actionOnLabel() {
+            "Save {GeoSample}";
+        }
+        actionOn() {
+            saveTabGroup("GeoSample", geo_sample_id, null, null, new SaveCallback() {
+                onSave(uuid, newRecord) {
+                    geo_sample_id = uuid;
+                    autoNumGeoSample();    
+                }
+            });
+        }
+    }, "success");
+
+    addNavigationButton("delete", new ActionButtonCallback() {
+        actionOnLabel() {
+            "Delete {GeoSample}";
+        }
+        actionOn() {
+            deleteGeoSample();
+        }
+    }, "danger");
+}
+
+cleanNumber(){
+    
+}
+
+confirmSample(){
+    showAlert("Confirm Sample!", "I confirm that I have labeled the sample bag and placed "+getFieldValue("GeoSample/GeoSample_GeneralInformation/Site_ID")+" in the vehicle.", "saveAndNewGeoSample();", null);
+    
+}
+
+/*** MISC ***/
+saveEntitiesToRel(String type, String entity1, String entity2) {
+    if (isNull(entity1) || isNull(entity2)) return;
+    saveRel(null, type, null, null, new SaveCallback() {
+        onSave(rel_id, newRecord) {
+            addReln(entity1, rel_id, null);
+            addReln(entity2, rel_id, null);
+        }
+    });
+}
+
+saveEntitiesToRel(String type, String entity1, String entity2, Callable callback) {
+    if (isNull(entity1) || isNull(entity2)) return;
+    saveRel(null, type, null, null, new SaveCallback() {
+        onSave(rel_id, newRecord) {
+            addReln(entity1, rel_id, null);
+            addReln(entity2, rel_id, null);
+            callback.call();
+        }
+    });
+}
+
+saveEntitiesToHierRel(String type, String entity1, String entity2, String e1verb, String e2verb) {
+    if (isNull(entity1) || isNull(entity2)) return;
+    saveRel(null, type, null, null, new SaveCallback() {
+        onSave(rel_id, newRecord) {
+            addReln(entity1, rel_id, e1verb);
+            addReln(entity2, rel_id, e2verb);
+        }
+    });
+}
+
+makeVocab(String type, String path, String attrib){
+    fetchAll("select vocabid, vocabname from vocabulary join attributekey using (attributeid) where attributename = '"+attrib+"' order by vocabcountorder",
+        new FetchCallback() {
+            onFetch(result) {
+                if(type.equals("CheckBoxGroup")) {
+                    populateCheckBoxGroup(path, result);
+                } else if(type.equals("DropDown")) {
+                    populateDropDown(path, result);
+                } else if(type.equals("RadioGroup")) {
+                    populateRadioGroup(path, result);
+                } else if(type.equals("List")) {
+                    populateList(path, result);
+                }
+            }
+        });
+}
+
+fillInGPS(String path){
+    Object position = getGPSPosition();    
+    Object projPosition = getGPSPositionProjected();
+    if (projPosition != null ){
+        Double latitude = position.getLatitude();
+        Double longitude = position.getLongitude();
+        Double northing = projPosition.getLatitude();
+        Double easting = projPosition.getLongitude();
+        setFieldValue(path+"Latitude", latitude);
+        setFieldValue(path+"Longitude", longitude);
+        setFieldValue(path+"Northing", northing);
+        setFieldValue(path+"Easting", easting);
+    } else {
+        showToast("GPS Not initialized");
+    }
 }
 
 doNotDelete(){
     showToast("Delete Cancelled.");
 }
 
-loadGeoSample() {
-	//newGeoSample();
-	GeoSample_id = getListItemValue();
-	loadGeoSampleFrom(GeoSample_id);
-}
-
-loadGeoSampleFrom(GeoSampleid) {
-	//newGeoSample();
-	GeoSample_id = GeoSampleid;
-	if (isNull(GeoSample_id)) return;
-	loadGeoSampleAttributes();	
-	showTabGroup("GeoSample", GeoSample_id);
-	
-
-}
-
-
-
-/*** MISC ***/
-
-
-saveEntitiesToRel(type, entity1, entity2) {
-	if (isNull(entity1) || isNull(entity2)) return;
-	
-	rel_id = saveRel(null, type, null, null);
-	addReln(entity1, rel_id, null);
-	addReln(entity2, rel_id, null);
-}
-
-
-
-saveEntitiesToHierRel(type, entity1, entity2, e1verb, e2verb) {
-	if (isNull(entity1) || isNull(entity2)) return;
-	
-	rel_id = saveRel(null, type, null, null);
-	addReln(entity1, rel_id, e1verb);
-	addReln(entity2, rel_id, e2verb);
-}
-
-
-makeVocab(String attrib){
-    Object a = fetchAll("select vocabid, vocabname from vocabulary join attributekey using (attributeid) where attributename = '"+attrib+"' ");
-    return a;
-}
-
-
-getCounterFromDB(){
-	Object counter = fetchOne(""+
-"select response, deviceMatch "+
-"  from (select coalesce(substr('00000'||(substr(freetext,8)+1),-5),'') as response, aenttimestamp, uuid in (select uuid "+
-"																							                  from latestnondeletedaentvalue AS av, localSettings "+
-"																							                 where localSettings.key = 'Device' "+
-"																							                   and localSettings.value = av.VocabID ) as deviceMatch "+
-"		  from latestnondeletedarchentidentifiers)      "+
-"where substr(response,-5) not in (select substr(freetext,-5) from latestnondeletedarchentidentifiers) "+
-"order by deviceMatch desc, aenttimestamp desc limit 1;");
-
-	String out = "";
-
-	if (!isNull(counter)){
-		 out = counter.get(0);
-		 
-		 if (counter.get(1).equals("0"))
-		 	showWarning("Alert!", "ID may be intruding in other Device's allocated ID range.");
-	}
-
-
-	setFieldValue("control/data/AutoIncrement", out);
-}
-
 /*** 'Uneditable' - you can edit the code below with extreme precaution ***/
+onEvent("control/map", "show", "loadMapSettings();");
+onEvent("control/map/centre", "click", "centreOnMe();");
+onEvent("control/map/saveSettings", "click", "saveMapSettings();");
 
-zoomGPS(){
-	Object position = getGPSPositionProjected();
-	Object projPosition = getGPSPositionProjected();
-	if (projPosition != null ){
-		Double latitude = projPosition.getLatitude();
-		Double longitude = projPosition.getLongitude();
-		showToast("Zooming to "+position.getLongitude()+", "+position.getLatitude());
-		setMapFocusPoint("control/map/map", longitude, latitude);
-	} else {
-		showToast("GPS Not initialized");
-	}
-
+centreOnMe() {
+    if(!isExternalGPSOn() && !isInternalGPSOn()) {
+        showToast("GPS is not enabled.");
+    } else {
+        centerOnCurrentPosition("control/map/map");
+    }
 }
 
-onEvent("control/map/zoomGPS", "click", "zoomGPS()");
+loadMapSettings() {
+    jsonFile = getAttachedFilePath("files/data/saved_config.json");
+    if(new File(jsonFile).exists()) loadMapViewConfiguration("control/Map/map", jsonFile, "showToast(\"Loaded map configuration\")");
+}
 
+saveMapSettings() {
+    file = getAttachedFilePath("files/data/saved_config.json");
+    saveMapViewConfiguration("control/Map/map", file, "showToast(\"Saved map configuration\")");
+}
 
 initMap() {
-	setMapZoom("control/map/map", 15.0f);
+    setMapZoom("control/map/map", 15.0f);
 
-	showBaseMap("control/map/map", "Base Layer", "files/data/maps/Otago_RTP.tif");
-	//createCanvasLayer("control/map/map", "Non-saved sketch layer");
+    showBaseMap("control/map/map", "Base Layer", "files/data/maps/Otago_RTP.tif");
+    //createCanvasLayer("control/map/map", "Non-saved sketch layer");
 /*
     //DATA_ENTRY_LAYER_ID = createCanvasLayer("control/map/map", DATA_ENTRY_LAYER);
 
-	isEntity = true;
-	queryName = "All entities";
-	querySQL = "SELECT uuid, aenttimestamp FROM latestNonDeletedArchEntIdentifiers";
-		
-	addDatabaseLayerQuery("control/map/map", queryName, querySQL);
+    isEntity = true;
+    queryName = "All entities";
+    querySQL = "SELECT uuid, aenttimestamp FROM latestNonDeletedArchEntIdentifiers";
+        
+    addDatabaseLayerQuery("control/map/map", queryName, querySQL);
 
-	addTrackLogLayerQuery("control/map/map", "track log entities", 
-		"SELECT uuid, max(aenttimestamp) as aenttimestamp\n" + 
-		" FROM archentity join aenttype using (aenttypeid)\n" +
-		" where archentity.deleted is null\n" + 
-		"   and lower(aenttypename) = lower('gps_track')\n" + 
-		" group by uuid\n" + 
-		" having max(aenttimestamp)");
-		
-	addSelectQueryBuilder("control/map/map", "Select entity by type", createQueryBuilder(
-		"select uuid\n" + 
-		"  from latestNonDeletedArchent\n" + 
-		"  JOIN latestNonDeletedAentValue using (uuid)\n" + 
-		"  join aenttype using (aenttypeid)\n" + 
-		"  LEFT OUTER JOIN vocabulary using (vocabid, attributeid) \n" + 
-		"  where lower(aenttypename) = lower(?) \n" + 
-		"   group by uuid").addParameter("Type", "RemoteSensingGeoSample"));
-		
-	//addLegacySelectQueryBuilder("control/map/map", "Select geometry by id", "files/data/maps/sydney.sqlite", "Geology100_Sydney", 
-	//	createLegacyQueryBuilder("Select PK_UID from Geology100_Sydney where PK_UID = ?").addParameter("ID", null));
-					
-	// define database layer styles for points, lines, polygons and text
-	ps = createPointStyle(10, Color.BLUE, 0.2f, 0.5f);
-	ls = createLineStyle(10, Color.GREEN, 0.05f, 0.3f, null);
-	pos = createPolygonStyle(10, Color.parseColor("#440000FF"), createLineStyle(10, Color.parseColor("#AA000000"), 0.01f, 0.3f, null));
-	ts = createTextStyle(10, Color.WHITE, 40, Typeface.SANS_SERIF);
+    addTrackLogLayerQuery("control/map/map", "track log entities", 
+        "SELECT uuid, max(aenttimestamp) as aenttimestamp\n" + 
+        " FROM archentity join aenttype using (aenttypeid)\n" +
+        " where archentity.deleted is null\n" + 
+        "   and lower(aenttypename) = lower('gps_track')\n" + 
+        " group by uuid\n" + 
+        " having max(aenttimestamp)");
+        
+    addSelectQueryBuilder("control/map/map", "Select entity by type", createQueryBuilder(
+        "select uuid\n" + 
+        "  from latestNonDeletedArchent\n" + 
+        "  JOIN latestNonDeletedAentValue using (uuid)\n" + 
+        "  join aenttype using (aenttypeid)\n" + 
+        "  LEFT OUTER JOIN vocabulary using (vocabid, attributeid) \n" + 
+        "  where lower(aenttypename) = lower(?) \n" + 
+        "   group by uuid").addParameter("Type", "RemoteSensingGeoSample"));
+        
+    //addLegacySelectQueryBuilder("control/map/map", "Select geometry by id", "files/data/maps/sydney.sqlite", "Geology100_Sydney", 
+    //  createLegacyQueryBuilder("Select PK_UID from Geology100_Sydney where PK_UID = ?").addParameter("ID", null));
+                    
+    // define database layer styles for points, lines, polygons and text
+    ps = createPointStyle(10, Color.BLUE, 0.2f, 0.5f);
+    ls = createLineStyle(10, Color.GREEN, 0.05f, 0.3f, null);
+    pos = createPolygonStyle(10, Color.parseColor("#440000FF"), createLineStyle(10, Color.parseColor("#AA000000"), 0.01f, 0.3f, null));
+    ts = createTextStyle(10, Color.WHITE, 40, Typeface.SANS_SERIF);
 
-	showDatabaseLayer("control/map/map", "Saved Data Layer", isEntity, queryName, querySQL, ps, ls, pos, ts);*/
+    showDatabaseLayer("control/map/map", "Saved Data Layer", isEntity, queryName, querySQL, ps, ls, pos, ts);*/
 
 
 }
 
 initMap();
 
-
-/*** TRACKLOG ***/
-/*
-setGPSUpdateInterval(4);
-
-onEvent("control/gps/startTimeLog", "click", "startTrackingGPS(\"time\", 10, \"saveTimeGPSTrack()\")");
-onEvent("control/gps/startDistanceLog", "click", "startTrackingGPS(\"distance\", 10, \"saveDistanceGPSTrack()\")");
-onEvent("control/gps/stopTrackLog", "click", "stopTrackingGPS()");
-
-saveTimeGPSTrack() {
-	List attributes = createAttributeList();
-	attributes.add(createEntityAttribute("gps_type", "time", null, null, null));
-	saveGPSTrack(attributes);
-}
-
-saveDistanceGPSTrack() {
-	List attributes = createAttributeList();
-	attributes.add(createEntityAttribute("gps_type", "distance", null, null, null));
-	saveGPSTrack(attributes);
-}
-
-saveGPSTrack(List attributes) {
-	position = getGPSPosition();
-	if (position == null) return;
-
-	//attributes.add(createEntityAttribute("gps_user", "" + user.getUserId(), null, null, null));
-	attributes.add(createEntityAttribute("gps_timestamp", "" + getCurrentTime(), null, null, null));
-	attributes.add(createEntityAttribute("gps_longitude", "" + position.getLongitude(), null, null, null));
-	attributes.add(createEntityAttribute("gps_latitude", "" + position.getLatitude(), null, null, null));
-	//attributes.add(createEntityAttribute("gps_heading", "" + getGPSHeading(), null, null, null));
-	attributes.add(createEntityAttribute("gps_accuracy", "" + getGPSEstimatedAccuracy(), null, null, null));
-	
-	positionProj = getGPSPositionProjected();
-	Point p = new Point(new MapPos(positionProj.getLongitude(), positionProj.getLatitude()), null, (PointStyle) null, null);
-	ArrayList l = new ArrayList();
-	l.add(p);
-	
-	saveArchEnt(null, "gps_track", l, attributes);
-}
-*/
 /*** USER ***/
 
-getDefaultUsersList() {
-	users = fetchAll("select userid, fname ||' ' || lname from user");
-	return users;
-}
+populateListForUsers() {
+    fetchAll("select userid, fname ||' ' || lname from user", new FetchCallback() {
+        onFetch(result) {
+            populateDropDown("user/usertab/users", result);        
+        }
+    });
+    makeVocab("DropDown", "user/usertab/samplingTeam", "Sampling Device");
 
-populateListForUsers(){
-    populateDropDown("user/usertab/users", getDefaultUsersList());
-    populateDropDown("user/usertab/samplingTeam", makeVocab("Sampling Device"));
-
-    Object localDevice = fetchOne("select value from localSettings where key = 'Device';");
-    Object localUser = fetchOne("select value from localSettings where key = 'User';");
-
-    if (!isNull(localDevice)){
-    	setFieldValue("user/usertab/samplingTeam", localDevice.get(0));
-    }
-
-    if (!isNull(localUser)){
-    	setFieldValue("user/usertab/users", localUser.get(0));
-    }
+    fetchOne("select value from localSettings where key = 'Device';", new FetchCallback() {
+        onFetch(result) {
+            if (!isNull(result)){
+                setFieldValue("user/usertab/samplingTeam", result.get(0));
+            }
+        }
+    });
+    fetchOne("select value from localSettings where key = 'User';", new FetchCallback() {
+        onFetch(result) {
+            if (!isNull(result)){
+                setFieldValue("user/usertab/users", result.get(0));
+            }
+        }
+    });
 }
 
 populateListForUsers();
@@ -435,19 +488,21 @@ populateListForUsers();
 String username = "";
 String device = "";
 
-login(){
-	Object userResult = fetchOne("select userid,fname,lname,email from user where userid='" + getFieldValue("user/usertab/users") + "';");
-	User user = new User(userResult.get(0),userResult.get(1),userResult.get(2),userResult.get(3));
-	userid = userResult.get(0);
-	setUser(user);
-	username = userResult.get(1) + " " + userResult.get(2);
-	showTabGroup("control");
- 
-	fetchOne("REPLACE INTO localSettings(key, value) VALUES('User', '"+userid+"');");
-	fetchOne("REPLACE INTO localSettings(key, value) VALUES('Device', '"+getFieldValue("user/usertab/samplingTeam")+"');");
+login() {
+    fetchOne("select userid,fname,lname,email from user where userid='" + getFieldValue("user/usertab/users") + "';",
+        new FetchCallback() {
+            onFetch(result) {
+                User user = new User(result.get(0),result.get(1),result.get(2),result.get(3));
+                userid = result.get(0);
+                setUser(user);
+                username = result.get(1) + " " + result.get(2);
+                showTabGroup("control");
 
-	getCounterFromDB();
-
+                fetchOne("REPLACE INTO localSettings(key, value) VALUES('User', '"+userid+"');", null);
+                fetchOne("REPLACE INTO localSettings(key, value) VALUES('Device', '"+getFieldValue("user/usertab/samplingTeam")+"');", null);
+                autoNumGeoSample();
+            }
+        });
 }
 
 
@@ -471,3 +526,5 @@ stopSync() {
     setSyncEnabled(false);
     setFileSyncEnabled(false);
 }
+
+loadGeoSampleAttributes();

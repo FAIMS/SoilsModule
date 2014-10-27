@@ -25,143 +25,160 @@
     <property type="freetext" name="Top Sample ID">
       <description>ID of the top sample, generated automatically in the following format: NZG - $$ - #### - A.</description>
     </property>
-    <property type="measure" name="Latitude">
+    <property type="float" name="Latitude">
       <description>In 4236/WGS-84, the latitude of the plotted point.</description>
     </property>
-    <property type="measure" name="Longitude">
+    <property type="float" name="Longitude">
       <description>In 4236/WGS-84, the longitude of the plotted point.</description>
     </property>
-    <property type="measure" name="Northing">
+    <property type="float" name="Northing">
       <description>In NZgrid 2000, (EPSG 2193), the Northing of the plotted point.</description>
     </property>
-    <property type="measure" name="Easting">
+    <property type="float" name="Easting">
       <description>In NZgrid 2000, (EPSG 2193), the Easting of the plotted point.</description>
     </property>    
-    <property type="enum" name="Collected?">
+    <property type="enum" name="Collected">
       <description></description>
       <lookup>
-        <term HeuristID="0-3300" StandardCode="">{No}<description/></term>
-        <term HeuristID="0-3299" StandardCode="">{Yes}<description/></term>
+        <term>{No_Observation}<description/></term>
+        <term>{No}<description/></term>
+        <term>{Yes}<description/></term>
       </lookup>
     </property>
     <property type="enum" name="Regolith A">
       <description>Regolith</description>
       <lookup>
-        <term HeuristID="0-3302" StandardCode="">{Resid}<description/></term>
-        <term HeuristID="0-3303" StandardCode="">{Trans}<description/></term>
+        <term>{No_Observation}<description/></term>
+        <term>{Resid}<description/></term>
+        <term>{Trans}<description/></term>
       </lookup>
     </property>
     <property type="enum" name="Horizon A">
       <description>Top Sample horizon</description>
       <lookup>
-        <term HeuristID="0-3306" StandardCode="">{A}<description/></term>
-        <term HeuristID="0-3307" StandardCode="">{B}<description/></term>
+        <term>{No_Observation}<description/></term>
+        <term>{A}<description/></term>
+        <term>{B}<description/></term>
       </lookup>
     </property>
     <property type="enum" name="Upper Depth A">
       <description>Top depth of the top sample</description>
       <lookup>
-        <term HeuristID="0-3310" StandardCode="">0<description/></term>
-        <term HeuristID="0-3310" StandardCode="">{Other}<description/></term>
+        <term>{No_Observation}<description/></term>
+        <term>{0}<description/></term>
+        <term>{Other}<description/></term>
       </lookup>
     </property>
     <property type="enum" name="Bottom Depth A">
       <description>Top sample bottom depth</description>
       <lookup>
-        <term HeuristID="0-3312" StandardCode="">{20}<description/></term>
-        <term HeuristID="0-3313" StandardCode="">{Other}<description/></term>
+        <term>{No_Observation}<description/></term>
+        <term>{20}<description/></term>
+        <term>{Other}<description/></term>
       </lookup>
     </property>
     <property type="enum" name="Dom Size A">
       <description>Sample Particle Size</description>
       <lookup>
-        <term HeuristID="0-3324" StandardCode="">{Clay}<description/></term>
-        <term HeuristID="0-3321" StandardCode="">{Gravel}<description/></term>
-        <term HeuristID="0-3322" StandardCode="">{Sand}<description/></term>
-        <term HeuristID="0-3323" StandardCode="">{Silt}<description/></term>
+        <term>{No_Observation}<description/></term>
+        <term>{Clay}<description/></term>
+        <term>{Gravel}<description/></term>
+        <term>{Sand}<description/></term>
+        <term>{Silt}<description/></term>
       </lookup>
     </property>
     <property type="enum" name="Fraction A">
       <description>Fraction</description>
       <lookup>
-        <term HeuristID="0-3315" StandardCode="">{&lt;2mm}<description/></term>
-        <term HeuristID="0-3316" StandardCode="">{Bulk}<description/></term>
+        <term>{No_Observation}<description/></term>
+        <term>{&lt;2mm}<description/></term>
+        <term>{Bulk}<description/></term>
       </lookup>
     </property>
     <property type="enum" name="State A">
       <description></description>
       <lookup>
-        <term HeuristID="0-3318" StandardCode="">{Damp}<description/></term>
-        <term HeuristID="0-3319" StandardCode="">{Dry}<description/></term>
+        <term>{No_Observation}<description/></term>
+        <term>{Damp}<description/></term>
+        <term>{Dry}<description/></term>
       </lookup>
     </property>
     <property type="freetext" name="Bottom Sample ID">
       <description>Auto-generated bottom sample ID</description>
     </property>
-    <property type="enum" name="Bottom Sample Collected?">
+    <property type="enum" name="Bottom Sample Collected">
       <description></description>
       <lookup>
-        <term HeuristID="0-3300" StandardCode="">{No}<description/></term>
-        <term HeuristID="0-3299" StandardCode="">{Yes}<description/></term>
+        <term>{No_Observation}<description/></term>
+        <term>{No}<description/></term>
+        <term>{Yes}<description/></term>
       </lookup>
     </property>
     <property type="enum" name="Regolith B">
       <description>Regolith B info</description>
       <lookup>
-        <term HeuristID="0-3302" StandardCode="">{Resid}<description/></term>
-        <term HeuristID="0-3303" StandardCode="">{Trans}<description/></term>
+        <term>{No_Observation}<description/></term>
+        <term>{Resid}<description/></term>
+        <term>{Trans}<description/></term>
       </lookup>
     </property>
     <property type="enum" name="Horizon B">
       <description>Horizon B</description>
       <lookup>
-        <term HeuristID="0-3326" StandardCode="">{B}<description/></term>
-        <term HeuristID="0-3327" StandardCode="">{C}<description/></term>
+        <term>{No_Observation}<description/></term>
+        <term>{B}<description/></term>
+        <term>{C}<description/></term>
       </lookup>
     </property>
     <property type="enum" name="Upper Depth B">
       <description>Top depth of bottom sample </description>
       <lookup>
-        <term HeuristID="0-3329" StandardCode="">{50}<description/></term>
-        <term HeuristID="0-3330" StandardCode="">{Other}<description/></term>
+        <term>{No_Observation}<description/></term>
+        <term>{50}<description/></term>
+        <term>{Other}<description/></term>
       </lookup>
     </property>
     <property type="enum" name="Bottom Depth B">
       <description>Bottom depth of bottom sample</description>
       <lookup>
-        <term HeuristID="0-3332" StandardCode="">{70}<description/></term>
-        <term HeuristID="0-3333" StandardCode="">{Other}<description/></term>
+        <term>{No_Observation}<description/></term>
+        <term>{70}<description/></term>
+        <term>{Other}<description/></term>
       </lookup>
     </property>
     <property type="enum" name="Dom Size B">
       <description>Dom Size B</description>
       <lookup>
-        <term HeuristID="0-3324" StandardCode="">{Clay}<description/></term>
-        <term HeuristID="0-3321" StandardCode="">{Gravel}<description/></term>
-        <term HeuristID="0-3322" StandardCode="">{Sand}<description/></term>
-        <term HeuristID="0-3323" StandardCode="">{Silt}<description/></term>
+        <term>{No_Observation}<description/></term>
+        <term>{Clay}<description/></term>
+        <term>{Gravel}<description/></term>
+        <term>{Sand}<description/></term>
+        <term>{Silt}<description/></term>
       </lookup>
     </property>
     <property type="enum" name="Fraction B">
       <description>Particle size in bottom sample</description>
       <lookup>
-        <term HeuristID="0-3315" StandardCode="">{&lt;2mm}<description/></term>
-        <term HeuristID="0-3316" StandardCode="">{Bulk}<description/></term>
+        <term>{No_Observation}<description/></term>
+        <term>{&lt;2mm}<description/></term>
+        <term>{Bulk}<description/></term>
       </lookup>
     </property>
     <property type="enum" name="State B">
       <description></description>
       <lookup>
-        <term HeuristID="0-3318" StandardCode="">{Damp}<description/></term>
-        <term HeuristID="0-3319" StandardCode="">{Dry}<description/></term>
+        <term>{No_Observation}<description/></term>
+        <term>{Damp}<description/></term>
+        <term>{Dry}<description/></term>
       </lookup>
     </property>
     <property type="enum" name="Slope">
       <description>What\'s the slope in the sampling area?</description>
       <lookup>
-        <term HeuristID="0-3338" StandardCode="">{Flat}<description/></term>
-        <term HeuristID="0-3337" StandardCode="">{Moderate}<description/></term>
-        <term HeuristID="0-3336" StandardCode="">{Steep}<description/></term>
+        <term>{No_Observation}<description/></term>
+        <term>{Flat}<description/></term>
+        <term>{Moderate}<description/></term>
+        <term>{Steep}<description/></term>
       </lookup>
     </property>
     <property type="freetext" name="Rock Type">
@@ -170,30 +187,31 @@
     <property type="enum" name="Landuse">
       <description>Select landuse type from the dropdown</description>
       <lookup>
-        <term HeuristID="0-3347" StandardCode="">{Commercial}<description/></term>
-        <term HeuristID="0-3343" StandardCode="">{Forest}<description/></term>
-        <term HeuristID="0-3344" StandardCode="">{Grasslands}<description/></term>
-        <term HeuristID="0-3348" StandardCode="">{Industrial}<description/></term>
-        <term HeuristID="0-3350" StandardCode="">{Mining}<description/></term>
-        <term HeuristID="0-3349" StandardCode="">{New_construction}<description/></term>
-        <term HeuristID="0-3351" StandardCode="">{Other}<description/></term>
-        <term HeuristID="0-3345" StandardCode="">{Recreation_park}<description/></term>
-        <term HeuristID="0-3340" StandardCode="">{Rural_crops}<description/></term>
-        <term HeuristID="0-3341" StandardCode="">{Rural_stock}<description/></term>
-        <term HeuristID="0-3342" StandardCode="">{Rural_village}<description/></term>
-        <term HeuristID="0-3346" StandardCode="">{Urban_residential}<description/></term>
+        <term>{No_Observation}<description/></term>
+        <term>{Commercial}<description/></term>
+        <term>{Forest}<description/></term>
+        <term>{Grasslands}<description/></term>
+        <term>{Industrial}<description/></term>
+        <term>{Mining}<description/></term>
+        <term>{New_construction}<description/></term>
+        <term>{Other}<description/></term>
+        <term>{Recreation_park}<description/></term>
+        <term>{Rural_crops}<description/></term>
+        <term>{Rural_stock}<description/></term>
+        <term>{Rural_village}<description/></term>
+        <term>{Urban_residential}<description/></term>
       </lookup>
     </property>
     <property type="freetext" name="Contamination">
       <description>Has the area been contaminated? Comment please.</description>
     </property>
-    <property type="blocktext" name="Comments">
+    <property type="freetext" name="Comments">
       <description>Provide any additional comments on the sampling site</description>
     </property>
     <property type="freetext" name="Photo Comments">
       <description>Have you taken any additional pictures separately from this app? Comment on them please.</description>
     </property>
-    <property type="file" name="Photo">
+    <property type="file" name="Photo" file="true" thumbnail="true">
       <description>Photos of the Site</description>
     </property>
     <property type="enum" name="Sampling Device">
