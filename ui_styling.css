@@ -57,7 +57,7 @@
     margin-left:5%;
 }
 
-.gps-status {
+.half-line {
     height: 60px;
 }
 
@@ -81,6 +81,18 @@
     border-width:1%;
     border-radius:10%;
     
+}
+
+.faims-blue-half {
+    background-color: #33b5e5;
+    border-color: #26a0cd;
+    color: white;
+    margin-left:7%;
+    margin-top:2%;
+    width:90%;
+    border-width:1%;
+    border-radius:4%;
+    font-size: 12px;
 }
 
 .faims-danger {

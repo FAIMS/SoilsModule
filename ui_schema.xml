@@ -155,7 +155,7 @@
             <value>placeholder</value>
           </item>
         </select1>
-        <trigger ref="login">
+        <trigger ref="login" faims_style_class="faims-blue">
           <label>Login</label>
         </trigger>
       </group>
@@ -167,7 +167,7 @@
         <input faims_certainty="false" faims_read_only="false" ref="AutoIncrement">
           <label>Number to Start autoincrementing IDs at.</label>
         </input>
-        <trigger ref="Create">
+        <trigger ref="Create" faims_style_class="faims-blue">
           <label>New {GeoSample}</label>
         </trigger>
         <select1 ref="GeoSampleList" appearance="compact" faims_annotation="false" faims_certainty="false" faims_style_class="menu-list">
@@ -187,13 +187,13 @@
           <label/>
           <group faims_style="even" ref="child1">
             <label/>
-            <trigger ref="centre">
+            <trigger ref="centre" faims_style_class="faims-blue">
               <label>{centerMe}</label>
             </trigger>
           </group>
           <group faims_style="even" ref="child2">
             <label/>
-            <trigger ref="saveSettings">
+            <trigger ref="saveSettings" faims_style_class="faims-blue-half">
               <label>{saveSettings}</label>
             </trigger>
           </group>
@@ -249,18 +249,18 @@
           <label/>
           <group faims_style="even" ref="child1">
             <label/>
-            <input ref="Northing" faims_attribute_name="Northing" faims_attribute_type="measure" faims_certainty="true" faims_annotation="true" faims_read_only="false">
+            <input ref="Northing" faims_attribute_name="Northing" faims_attribute_type="measure" faims_certainty="true" faims_annotation="true" faims_read_only="false" faims_style_class="half-line">
               <label>{Northing}</label>
             </input>
           </group>
           <group faims_style="even" ref="child2">
             <label/>
-            <input ref="Easting" faims_attribute_name="Easting" faims_attribute_type="measure" faims_certainty="true" faims_annotation="true" faims_read_only="false">
+            <input ref="Easting" faims_attribute_name="Easting" faims_attribute_type="measure" faims_certainty="true" faims_annotation="true" faims_read_only="false" faims_style_class="half-line">
               <label>{Easting}</label>
             </input>
           </group>
         </group>
-        <trigger ref="takeGPS">
+        <trigger ref="takeGPS" faims_style_class="faims-blue">
           <label>{TakeGPS}</label>
         </trigger>
         <select ref="Photo" type="camera" faims_attribute_name="Photo" faims_attribute_type="measure" faims_certainty="true" faims_annotation="true" faims_read_only="false" faims_sync="true">
@@ -270,7 +270,7 @@
             <value>placeholder</value>
           </item>
         </select>
-        <trigger ref="attachPhoto">
+        <trigger ref="attachPhoto" faims_style_class="faims-blue">
           <label>Take Picture</label>
         </trigger>
       </group>
@@ -335,7 +335,7 @@
             <value>placeholder</value>
           </item>
         </select1>
-        <trigger ref="next">
+        <trigger ref="next" faims_style_class="faims-blue">
           <label>{Next}</label>
         </trigger>
       </group>
@@ -400,7 +400,7 @@
             <value>placeholder</value>
           </item>
         </select1>
-        <trigger ref="next">
+        <trigger ref="next" faims_style_class="faims-blue">
           <label>{Next}</label>
         </trigger>
       </group>
@@ -439,10 +439,10 @@
             <value>placeholder</value>
           </item>
         </select1>
-          <trigger ref="SaveAndNew">
+          <trigger ref="SaveAndNew" faims_style_class="faims-success">
           <label>Save and New {GeoSample}</label>
         </trigger>
-        <trigger ref="Delete">
+        <trigger ref="Delete" faims_style_class="faims-danger">
           <label>Delete {GeoSample}</label>
         </trigger>
       </group>
