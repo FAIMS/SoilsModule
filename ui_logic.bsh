@@ -405,18 +405,18 @@ centreOnMe() {
 
 loadMapSettings() {
     jsonFile = getAttachedFilePath("files/data/saved_config.json");
-    if(new File(jsonFile).exists()) loadMapViewConfiguration("control/Map/map", jsonFile, "showToast(\"Loaded map configuration\")");
+    if(new File(jsonFile).exists()) loadMapViewConfiguration("control/map/map", jsonFile, "showToast(\"Loaded map configuration\")");
 }
 
 saveMapSettings() {
     file = getAttachedFilePath("files/data/saved_config.json");
-    saveMapViewConfiguration("control/Map/map", file, "showToast(\"Saved map configuration\")");
+    saveMapViewConfiguration("control/map/map", file, "showToast(\"Saved map configuration\")");
 }
 
 initMap() {
     setMapZoom("control/map/map", 15.0f);
 
-    showBaseMap("control/map/map", "Base Layer", "files/data/maps/Otago_RTP.tif");
+    showBaseMap("control/map/map", "Base Layer", "files/data/maps/GSydneyproj.tif");
     //createCanvasLayer("control/map/map", "Non-saved sketch layer");
 /*
     //DATA_ENTRY_LAYER_ID = createCanvasLayer("control/map/map", DATA_ENTRY_LAYER);
@@ -475,12 +475,12 @@ populateListForUsers() {
             });
         }
     });
-    makeVocab("RadioGroup", "user/usertab/Team", "Device ID");
+    makeVocab("DropDown", "user/usertab/samplingTeam", "Sampling Device");
 
-    fetchOne("select value from localSettings where key = 'Team';", new FetchCallback() {
+    fetchOne("select value from localSettings where key = 'Device';", new FetchCallback() {
         onFetch(result) {
             if (!isNull(result)){
-                setFieldValue("user/usertab/Team", result.get(0));
+                setFieldValue("user/usertab/samplingTeam", result.get(0));
             }
         }
     });
