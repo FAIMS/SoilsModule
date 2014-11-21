@@ -83,7 +83,7 @@ addActionBarItem("external_gps", new ToggleActionButtonCallback() {
 
 showWarning("Thanks for trying this module!", "We have provided this module for Demonstration purposes only. You can customise the module yourself or we can help you. Contact info@fedarch.org for help.");
 
-makeLocalID(){
+makeLocalID() {
     fetchOne("CREATE TABLE IF NOT EXISTS localSettings (key text primary key, value text);",  null);
 }
 
@@ -94,35 +94,20 @@ makeLocalID();
 onEvent("control/data", "show", "refreshEntities();removeNavigationButtons();");
 onEvent("control/data/GeoSampleList", "click", "loadGeoSample();");
 onEvent("control/data/Create", "delayclick", "newGeoSample();");
-onEvent("control/gps/connectinternal", "click", "internalGPSLogic();");
-onEvent("control/gps/connectexternal", "click", "externalGPSLogic();");
 
 refreshEntities() {
-    fetchEntityList("GeoSample", new FetchCallback() {
-        onFetch(result) {
-            populateList("control/data/GeoSampleList", result);    
-        }
-        
-    });
+    populateCursorList("control/data/GeoSampleList", "select uuid, group_concat(coalesce(measure, ''),' ') as response " + 
+        "from (select * from latestNonDeletedArchentIdentifiers order by attributename DESC) " +
+        "where aenttypename = 'GeoSample' " +
+        "group by uuid " +
+        "order by response DESC limit ? offset ?;", 25);
 }
 
 removeNavigationButtons() {
-    removeNavigationButton("save");
+    removeNavigationButton("duplicate");
+    removeNavigationButton("save_and_new");
+    removeNavigationButton("save_and_close");
     removeNavigationButton("delete");
-}
-
-internalGPSLogic() {
-    if(isExternalGPSOn()) {
-        stopGPS();
-    }
-    startInternalGPS();
-}
-
-externalGPSLogic() {
-    if(isInternalGPSOn()) {
-        stopGPS();
-    }
-    startExternalGPS();
 }
 
 /*** ArchEnt: GeoSample ***/
@@ -130,7 +115,7 @@ onEvent("GeoSample", "show", "addGeoSampleNavigation();");
 onEvent("GeoSample/GeoSample_GeneralInformation/attachPhoto", "click", "attachPictureTo(\"GeoSample/GeoSample_GeneralInformation/Photo\");");
 onEvent("GeoSample/GeoSample_GeneralInformation/takeGPS", "delayclick", "fillInGPS(\"GeoSample/GeoSample_GeneralInformation/\");");
 
-onEvent("GeoSample/GeoSample_Rock_Information/SaveAndNew", "delayclick", "confirmSample()");
+onEvent("GeoSample/GeoSample_Rock_Information/New", "delayclick", "confirmSample()");
 onEvent("GeoSample/GeoSample_Rock_Information/Delete", "delayclick", "deleteGeoSample()");
 
 onEvent("GeoSample/GeoSample_Top_Sample/next", "click", "showTab(\"GeoSample/GeoSample_Bottom_Sample\");");
@@ -138,7 +123,7 @@ onEvent("GeoSample/GeoSample_Bottom_Sample/next", "click", "showTab(\"GeoSample/
 
 String geo_sample_id = null;
 
-newGeoSample(){
+newGeoSample() {
     if (!isNull(getFieldValue("control/data/AutoIncrement"))) {
         newTabGroup("GeoSample");
         geo_sample_id = null;
@@ -151,27 +136,11 @@ newGeoSample(){
                             onFetch(result) {
                                 String deviceNumber = result.get(0).replaceAll("([^0-9]+)", "");
                                 setFieldValue("GeoSample/GeoSample_GeneralInformation/Site_ID", "NZG-"+deviceNumber+"-"+getFieldValue("control/data/AutoIncrement"));
-                                fetchOne("select datetime('now', 'localtime');", new FetchCallback() {
-                                    onFetch(result) {
-                                        setFieldValue("GeoSample/GeoSample_GeneralInformation/Timestamp", result.get(0));
-                                    }
-                                });
+                                setTimestamp("GeoSample/GeoSample_GeneralInformation/Timestamp");
                                 setFieldValue("GeoSample/GeoSample_Top_Sample/Top_Sample_ID", getFieldValue("GeoSample/GeoSample_GeneralInformation/Site_ID")+"-A");
                                 setFieldValue("GeoSample/GeoSample_Bottom_Sample/Bottom_Sample_ID", getFieldValue("GeoSample/GeoSample_GeneralInformation/Site_ID")+"-B");
                                 setFieldValue("GeoSample/GeoSample_Rock_Information/Sampling_Device", getFieldValue("user/usertab/samplingTeam"));
-                                saveTabGroup("GeoSample", geo_sample_id, null, null, new SaveCallback() {
-                                    onSave(uuid, newRecord) {
-                                        geo_sample_id = uuid;
-                                        autoNumGeoSample();
-                                        // Turn on autosaving
-                                        saveTabGroup("GeoSample", geo_sample_id, null, null, new SaveCallback() {
-                                            onSave(uuid, newRecord) {
-                                                geo_sample_id = uuid;
-                                                autoNumGeoSample();
-                                            }
-                                        }, true);
-                                    }
-                                });
+                                saveGeoSample();
                             }
                         });
                 }
@@ -193,7 +162,7 @@ loadGeoSampleFrom(entid) {
         return;
     }
     showTabGroup("GeoSample", geo_sample_id, new FetchCallback() {
-        onFetch(result){
+        onFetch(result) {
             saveTabGroup("GeoSample", geo_sample_id, null, null, new SaveCallback() {
                 onSave(uuid, newRecord) {
                     geo_sample_id = uuid;
@@ -204,20 +173,23 @@ loadGeoSampleFrom(entid) {
     });
 }
 
-saveAndNewGeoSample() {
-    if (isNull(getFieldValue("GeoSample/GeoSample_GeneralInformation/Site_ID"))) {
-        showWarning("Validation Error", "Cannot save {GeoSample} without Site ID");
-        return;
-    }
+saveGeoSample() {
     saveTabGroup("GeoSample", geo_sample_id, null, null, new SaveCallback() {
         onSave(uuid, newRecord) {
             geo_sample_id = uuid;
-            newGeoSample();
+            autoNumGeoSample();
+            // Turn on autosaving
+            saveTabGroup("GeoSample", geo_sample_id, null, null, new SaveCallback() {
+                onSave(uuid, newRecord) {
+                    geo_sample_id = uuid;
+                    autoNumGeoSample();
+                }
+            }, true);
         }
     });
 }
 
-deleteGeoSample(){
+deleteGeoSample() {
     if (!isNull(geo_sample_id)) {
         showAlert("Confirm Deletion", "Press OK to Delete this GeoSample!", "reallyDeleteGeoSample()", "doNotDelete()");
     } else {
@@ -225,35 +197,16 @@ deleteGeoSample(){
     }
 }
 
-reallyDeleteGeoSample(){
-    deleteArchEnt(geo_sample_id);
-    cancelTabGroup("GeoSample", false);
-    autoNumGeoSample();
+reallyDeleteGeoSample() {
+    deleteArchEnt(geo_sample_id, new DeleteCallback() {
+        onDelete(uuid) {
+            cancelTabGroup("GeoSample", false);
+            autoNumGeoSample();        
+        }
+    });
 }
 
-autoNumGeoSample() {
-    fetchOne("select response, deviceMatch "+
-             "from (select coalesce(substr('00000'||(substr(measure,8)+1),-5),'') as response, aenttimestamp, uuid in (select uuid " +
-             "      from latestnondeletedaentvalue AS av, localSettings "+
-             "      where localSettings.key = 'Device' "+
-             "      and localSettings.value = av.VocabID ) as deviceMatch "+
-             "  from latestnondeletedarchentidentifiers) "+
-             "where substr(response,-5) not in (select substr(measure,-5) from latestnondeletedarchentidentifiers) "+
-             "order by deviceMatch desc, aenttimestamp desc limit 1;", new FetchCallback() {
-                onFetch(result) {
-                    String out = "";
-                    if (!isNull(result)){
-                        out = result.get(0);
-                        if (result.get(1).equals("0")) {
-                            showWarning("Alert!", "ID may be intruding in other Device's allocated ID range.");
-                        }
-                    }
-                    setFieldValue("control/data/AutoIncrement", out);
-                }
-             });
-}
-
-loadGeoSampleAttributes(){
+loadGeoSampleAttributes() {
     makeVocab("RadioGroup", "GeoSample/GeoSample_Top_Sample/Collected", "Collected");
     makeVocab("RadioGroup", "GeoSample/GeoSample_Top_Sample/Regolith_A", "Regolith A");
     makeVocab("RadioGroup", "GeoSample/GeoSample_Top_Sample/Horizon_A", "Horizon A");
@@ -284,20 +237,53 @@ loadGeoSampleAttributes(){
 }
 
 addGeoSampleNavigation() {
-    removeNavigationButton("save");
+    removeNavigationButton("duplicate");
+    removeNavigationButton("save_and_new");
+    removeNavigationButton("save_and_close");
     removeNavigationButton("delete");
 
-    addNavigationButton("save", new ActionButtonCallback() {
+    addNavigationButton("duplicate", new ActionButtonCallback() {
         actionOnLabel() {
-            "Save {GeoSample}";
+            "Duplicate {GeoSample}";
         }
         actionOn() {
-            saveTabGroup("GeoSample", geo_sample_id, null, null, new SaveCallback() {
-                onSave(uuid, newRecord) {
-                    geo_sample_id = uuid;
-                    autoNumGeoSample();    
+            showTabGroup("GeoSample", geo_sample_id, new FetchCallback() {
+                onFetch(result) {
+                    geo_sample_id = null;
+                    autoNumGeoSample();
+                    setTimestamp("GeoSample/GeoSample_GeneralInformation/Timestamp");
+                    populateCameraPictureGallery("GeoSample/GeoSample_GeneralInformation/Photo", new ArrayList());
+                    saveTabGroup("GeoSample", geo_sample_id, null, null, new SaveCallback() {
+                        onSave(uuid, newRecord) {
+                            geo_sample_id = uuid;
+                            autoNumGeoSample();
+                            saveTabGroup("GeoSample", geo_sample_id, null, null, new SaveCallback() {
+                                onSave(uuid, newRecord) {
+                                    geo_sample_id = uuid;
+                                }
+                            }, true);
+                        }
+                    });
                 }
             });
+        }
+    }, "success");
+
+    addNavigationButton("save_and_new", new ActionButtonCallback() {
+        actionOnLabel() {
+            "New {GeoSample}";
+        }
+        actionOn() {
+            newGeoSample();
+        }
+    }, "success");
+
+    addNavigationButton("save_and_close", new ActionButtonCallback() {
+        actionOnLabel() {
+            "Close {GeoSample}";
+        }
+        actionOn() {
+            cancelTabGroup("GeoSample", false);
         }
     }, "success");
 
@@ -311,12 +297,30 @@ addGeoSampleNavigation() {
     }, "danger");
 }
 
-cleanNumber(){
-    
+autoNumGeoSample() {
+    fetchOne("select response, deviceMatch "+
+             "from (select coalesce(substr('00000'||(substr(measure,8)+1),-5),'') as response, aenttimestamp, uuid in (select uuid " +
+             "      from latestnondeletedaentvalue AS av, localSettings "+
+             "      where localSettings.key = 'Device' "+
+             "      and localSettings.value = av.VocabID ) as deviceMatch "+
+             "  from latestnondeletedarchentidentifiers) "+
+             "where substr(response,-5) not in (select substr(measure,-5) from latestnondeletedarchentidentifiers) "+
+             "order by deviceMatch desc, aenttimestamp desc limit 1;", new FetchCallback() {
+                onFetch(result) {
+                    String out = "";
+                    if (!isNull(result)) {
+                        out = result.get(0);
+                        if (result.get(1).equals("0")) {
+                            showWarning("Alert!", "ID may be intruding in other Device's allocated ID range.");
+                        }
+                    }
+                    setFieldValue("control/data/AutoIncrement", out);
+                }
+             });
 }
 
-confirmSample(){
-    showAlert("Confirm Sample!", "I confirm that I have labeled the sample bag and placed "+getFieldValue("GeoSample/GeoSample_GeneralInformation/Site_ID")+" in the vehicle.", "saveAndNewGeoSample();", null);
+confirmSample() {
+    showAlert("Confirm Sample!", "I confirm that I have labeled the sample bag and placed "+getFieldValue("GeoSample/GeoSample_GeneralInformation/Site_ID")+" in the vehicle.", "newGeoSample();", null);
     
 }
 
@@ -352,7 +356,7 @@ saveEntitiesToHierRel(String type, String entity1, String entity2, String e1verb
     });
 }
 
-makeVocab(String type, String path, String attrib){
+makeVocab(String type, String path, String attrib) {
     fetchAll("select vocabid, vocabname from vocabulary join attributekey using (attributeid) where attributename = '"+attrib+"' order by vocabcountorder",
         new FetchCallback() {
             onFetch(result) {
@@ -369,10 +373,14 @@ makeVocab(String type, String path, String attrib){
         });
 }
 
-fillInGPS(String path){
+setTimestamp(String path) {
+    setFieldValue(path, new java.text.SimpleDateFormat("yyyy-MM-dd HH:mm:ss z").format(new Date()));
+}
+
+fillInGPS(String path) {
     Object position = getGPSPosition();    
     Object projPosition = getGPSPositionProjected();
-    if (projPosition != null ){
+    if (projPosition != null ) {
         Double latitude = position.getLatitude();
         Double longitude = position.getLongitude();
         Double northing = projPosition.getLatitude();
@@ -386,7 +394,7 @@ fillInGPS(String path){
     }
 }
 
-doNotDelete(){
+doNotDelete() {
     showToast("Delete Cancelled.");
 }
 
@@ -468,7 +476,7 @@ populateListForUsers() {
             populateDropDown("user/usertab/users", result);
             fetchOne("select value from localSettings where key = 'User';", new FetchCallback() {
                 onFetch(result) {
-                    if (!isNull(result)){
+                    if (!isNull(result)) {
                         setFieldValue("user/usertab/users", result.get(0));
                     }
                 }
@@ -479,7 +487,7 @@ populateListForUsers() {
 
     fetchOne("select value from localSettings where key = 'Device';", new FetchCallback() {
         onFetch(result) {
-            if (!isNull(result)){
+            if (!isNull(result)) {
                 setFieldValue("user/usertab/samplingTeam", result.get(0));
             }
         }
@@ -508,26 +516,6 @@ login() {
         });
 }
 
-
 onEvent("user/usertab/login", "delayclick", "login()");
-
-/*** SYNC ***/
-
-onEvent("control/gps/startsync", "click", "startSync()");
-onEvent("control/gps/stopsync", "click", "stopSync()");
-
-setSyncMinInterval(10.0f);
-setSyncMaxInterval(20.0f);
-setSyncDelay(5.0f);
-
-startSync() {
-    setSyncEnabled(true);
-    setFileSyncEnabled(true);
-}
-
-stopSync() {
-    setSyncEnabled(false);
-    setFileSyncEnabled(false);
-}
 
 loadGeoSampleAttributes();

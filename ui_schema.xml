@@ -43,13 +43,6 @@
                 </child2>
               </container1>
             </map>
-            <gps>
-              <connectinternal/>
-              <connectexternal/>
-              <stopGPS/>
-              <startsync/>
-              <stopsync/>
-            </gps>
           </control>
           <!--list of tabgroups for entities-->
           <!--ArchEnt / Record Type: GEOSAMPLE-->
@@ -108,9 +101,8 @@
               <Contamination/>
               <Photo_Comments/>
               <Comments/>
-              <Update/>
               <Delete/>
-              <SaveAndNew/>
+              <New/>
               <Sampling_Device/>
             </GeoSample_Rock_Information>
           </GeoSample>
@@ -198,24 +190,6 @@
             </trigger>
           </group>
         </group>
-      </group>
-      <group ref="gps">
-        <label>{Control}</label>
-        <trigger ref="connectinternal">
-          <label>{connectinternal}</label>
-        </trigger>
-        <trigger ref="connectexternal">
-          <label>{connectexternal}</label>
-        </trigger>
-        <trigger ref="stopGPS">
-          <label>{stopGPS}</label>
-        </trigger>
-        <trigger ref="startsync">
-          <label>{startsync}</label>
-        </trigger>
-        <trigger ref="stopsync">
-          <label>{stopsync}</label>
-        </trigger>
       </group>
     </group>
 
@@ -439,8 +413,8 @@
             <value>placeholder</value>
           </item>
         </select1>
-          <trigger ref="SaveAndNew" faims_style_class="faims-success">
-          <label>Save and New {GeoSample}</label>
+          <trigger ref="New" faims_style_class="faims-success">
+          <label>New {GeoSample}</label>
         </trigger>
         <trigger ref="Delete" faims_style_class="faims-danger">
           <label>Delete {GeoSample}</label>
