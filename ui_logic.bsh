@@ -9,7 +9,7 @@ startInternalGPS();
 
 addActionBarItem("sync", new ToggleActionButtonCallback() {
     actionOnLabel() {
-        "Sync enabled";
+        "Disable Sync";
     }
     actionOn() {
         setSyncEnabled(false);
@@ -20,7 +20,7 @@ addActionBarItem("sync", new ToggleActionButtonCallback() {
         isSyncEnabled();
     }
     actionOffLabel() {
-        "Sync disabled";
+        "Enable Sync";
     }
     actionOff() {
         setSyncEnabled(true);
@@ -31,7 +31,7 @@ addActionBarItem("sync", new ToggleActionButtonCallback() {
 
 addActionBarItem("internal_gps", new ToggleActionButtonCallback() {
     actionOnLabel() {
-        "Internal GPS enabled";
+        "Enable Internal GPS";
     }
     actionOn() {
         stopGPS();
@@ -41,7 +41,7 @@ addActionBarItem("internal_gps", new ToggleActionButtonCallback() {
         isInternalGPSOn();
     }
     actionOffLabel() {
-        "Internal GPS disabled";
+        "Disable Internal GPS";
     }
     actionOff() {
         if(isExternalGPSOn()) {
@@ -54,7 +54,7 @@ addActionBarItem("internal_gps", new ToggleActionButtonCallback() {
 
 addActionBarItem("external_gps", new ToggleActionButtonCallback() {
     actionOnLabel() {
-        "External GPS enabled";
+        "Disable External GPS";
     }
     actionOn() {
         stopGPS();
@@ -64,7 +64,7 @@ addActionBarItem("external_gps", new ToggleActionButtonCallback() {
         isExternalGPSOn();
     }
     actionOffLabel() {
-        "External GPS disabled";
+        "Disable External GPS";
     }
     actionOff() {
         if(isInternalGPSOn()) {
