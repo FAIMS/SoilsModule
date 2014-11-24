@@ -336,37 +336,6 @@ confirmSample() {
 }
 
 /*** MISC ***/
-saveEntitiesToRel(String type, String entity1, String entity2) {
-    if (isNull(entity1) || isNull(entity2)) return;
-    saveRel(null, type, null, null, new SaveCallback() {
-        onSave(rel_id, newRecord) {
-            addReln(entity1, rel_id, null);
-            addReln(entity2, rel_id, null);
-        }
-    });
-}
-
-saveEntitiesToRel(String type, String entity1, String entity2, Callable callback) {
-    if (isNull(entity1) || isNull(entity2)) return;
-    saveRel(null, type, null, null, new SaveCallback() {
-        onSave(rel_id, newRecord) {
-            addReln(entity1, rel_id, null);
-            addReln(entity2, rel_id, null);
-            if(callback != null) callback.call();
-        }
-    });
-}
-
-saveEntitiesToHierRel(String type, String entity1, String entity2, String e1verb, String e2verb) {
-    if (isNull(entity1) || isNull(entity2)) return;
-    saveRel(null, type, null, null, new SaveCallback() {
-        onSave(rel_id, newRecord) {
-            addReln(entity1, rel_id, e1verb);
-            addReln(entity2, rel_id, e2verb);
-        }
-    });
-}
-
 makeVocab(String type, String path, String attrib) {
     fetchAll("select vocabid, vocabname from vocabulary join attributekey using (attributeid) where attributename = '"+attrib+"' order by vocabcountorder",
         new FetchCallback() {
