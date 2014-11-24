@@ -105,8 +105,8 @@ refreshEntities() {
 
 removeNavigationButtons() {
     removeNavigationButton("duplicate");
-    removeNavigationButton("save_and_new");
-    removeNavigationButton("save_and_close");
+    removeNavigationButton("new");
+    removeNavigationButton("close");
     removeNavigationButton("delete");
 }
 
@@ -238,8 +238,8 @@ loadGeoSampleAttributes() {
 
 addGeoSampleNavigation() {
     removeNavigationButton("duplicate");
-    removeNavigationButton("save_and_new");
-    removeNavigationButton("save_and_close");
+    removeNavigationButton("new");
+    removeNavigationButton("close");
     removeNavigationButton("delete");
 
     addNavigationButton("duplicate", new ActionButtonCallback() {
@@ -269,20 +269,31 @@ addGeoSampleNavigation() {
         }
     }, "success");
 
-    addNavigationButton("save_and_new", new ActionButtonCallback() {
+    addNavigationButton("new", new ActionButtonCallback() {
         actionOnLabel() {
             "New {GeoSample}";
         }
         actionOn() {
-            newGeoSample();
+            if(!isNull(geo_sample_id)) {
+                cancelTabGroup("GeoSample", false);
+                newGeoSample();
+            } else {
+                showAlert("Warning", "You will lose any unsaved changes!", "newGeoSample()", "");
+            }   
         }
     }, "success");
 
-    addNavigationButton("save_and_close", new ActionButtonCallback() {
+    addNavigationButton("close", new ActionButtonCallback() {
         actionOnLabel() {
             "Close {GeoSample}";
         }
         actionOn() {
+            if(!isNull(geo_sample_id)) {
+                cancelTabGroup("GeoSample", false);
+            } else {
+                cancelTabGroup("GeoSample", true);
+            }
+
             cancelTabGroup("GeoSample", false);
         }
     }, "success");
