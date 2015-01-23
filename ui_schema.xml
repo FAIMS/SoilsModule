@@ -110,10 +110,6 @@
       </instance>
       <!--list of numeric and blocktext(memo) attributes(fields)-->
       <bind nodeset="/faims/control/data/AutoIncrement" type="decimal"/>
-      <bind nodeset="/faims/GeoSample/GeoSample_GeneralInformation/container1/child1/Latitude" type="decimal"/>
-      <bind nodeset="/faims/GeoSample/GeoSample_GeneralInformation/container1/child2/Longitude" type="decimal"/>
-      <bind nodeset="/faims/GeoSample/GeoSample_GeneralInformation/container2/child1/Northing" type="decimal"/>
-      <bind nodeset="/faims/GeoSample/GeoSample_GeneralInformation/container2/child2/Easting" type="decimal"/>
     </model>
   </h:head>
   <h:body>
@@ -183,7 +179,7 @@
           <label/>
           <group faims_style="even" ref="child1">
             <label/>
-            <trigger ref="centre" faims_style_class="faims-blue-half">
+            <trigger ref="centre" faims_style_class="faims-blue">
               <label>{centerMe}</label>
             </trigger>
           </group>
@@ -212,13 +208,13 @@
           <label/>
           <group faims_style="even" ref="child1">
             <label/>
-            <input ref="Latitude" faims_attribute_name="Latitude" faims_attribute_type="measure" faims_certainty="true" faims_annotation="true" faims_read_only="true">
+            <input ref="Latitude" faims_attribute_name="Latitude" faims_attribute_type="measure" faims_certainty="true" faims_annotation="true" faims_read_only="false">
               <label>{Latitude}</label>
             </input>
           </group>
           <group faims_style="even" ref="child2">
             <label/>
-            <input ref="Longitude" faims_attribute_name="Longitude" faims_attribute_type="measure" faims_certainty="true" faims_annotation="true" faims_read_only="true">
+            <input ref="Longitude" faims_attribute_name="Longitude" faims_attribute_type="measure" faims_certainty="true" faims_annotation="true" faims_read_only="false">
               <label>{Longitude}</label>
             </input>
           </group>
