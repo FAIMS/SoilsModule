@@ -451,7 +451,7 @@ initMap();
 /*** USER ***/
 
 populateListForUsers() {
-    fetchAll("select userid, fname ||' ' || lname from user", new FetchCallback() {
+    fetchAll("select userid, fname || ' ' || lname from user where userdeleted is null", new FetchCallback() {
         onFetch(result) {
             populateDropDown("user/usertab/users", result);
             fetchOne("select value from localSettings where key = 'User';", new FetchCallback() {
